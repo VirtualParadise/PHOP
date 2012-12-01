@@ -7,9 +7,9 @@ define("RGX_REAL", '[0-9]+\\.?[0-9]*');
 define('RGX_PRIMNAME', '/^(?<type>[a-z]+)(?<params>.+?)$/i');
 define('RGX_PRIMWALL', '/(?<x>'.RGX_REAL.')(x(?<y>'.RGX_REAL.'))?(?<p>p)?/i');
 define('MIN_VALUE', 0.001);
-define('MM_X', 2000);
-define('MM_Y', 1000);
-define('MM_UV', 200);
+define('MM_X', (float)2000);
+define('MM_Y', (float)1000);
+define('MM_UV', (float)100);
 require_once('phop.lib.php');
 
 
@@ -75,17 +75,32 @@ function primWall($values, $isPanel) {
    // Optional parameters (tag + UV planar scaling)
    $phantom = e($dim['p']) ? 'on' : 'off';
    $tag = parseTagNumber(pick($values[1], 200));
-   if (e($values[2])) {
-      $uvX = $rawX / (MM_UV / 1);
-      $uvY = $rawY / (MM_UV / 1);
-   } else if ( e($values[3]) && is_numeric($values[2]) ) {
-      $uvX = $rawX / (MM_UV / $values[2]);
-      $uvY = $rawY / (MM_UV / $values[2]);
-   } else if (is_numeric($values[3])) {
-      $uvX = $rawX / (MM_UV / $values[2]);
-      $uvY = $rawY / (MM_UV / $values[3]);
+   if ($isPanel) {
+      if (e($values[2])) {
+         $uvX = 1;
+         $uvY = 1;
+      } else if ( e($values[3]) && is_numeric($values[2]) ) {
+         $uvX = (float)$values[2];
+         $uvY = (float)$values[2];
+      } else if (is_numeric($values[3])) {
+         $uvX = (float)$values[2];
+         $uvY = (float)$values[3];
+      } else {
+         fail("Invalid panel parameters", 400);
+      }
    } else {
-      fail("Invalid wall parameters", 400);
+      if (e($values[2])) {
+         $uvX = $rawX / (MM_UV / 1);
+         $uvY = $rawY / (MM_UV / 1);
+      } else if ( e($values[3]) && is_numeric($values[2]) ) {
+         $uvX = $rawX / (MM_UV / (float)$values[2]);
+         $uvY = $rawY / (MM_UV / (float)$values[2]);
+      } else if (is_numeric($values[3])) {
+         $uvX = $rawX / (MM_UV / (float)$values[2]);
+         $uvY = $rawY / (MM_UV / (float)$values[3]);
+      } else {
+         fail("Invalid wall parameters", 400);
+      }
    }
 
    // Generate using template

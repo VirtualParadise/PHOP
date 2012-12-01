@@ -5,7 +5,7 @@
 require_once('phop.lib.php');
 
 function main() {
-   debug('PHOP', 'v.005');
+   debug('PHOP', 'v.006');
    $Q = $_GET['q'];
    $parts = explode("/", $Q, 2);
    $dir = $parts[0];
@@ -53,7 +53,7 @@ function getPlugin($dir, $file) {
          return gotoUrl("http://imgur.com/$data");
       case "p":
          $data = str_replace('.zip','',$data);
-         return gotoUrl("prim.php?q=$data");
+         return gotoUrl("phop.prim.php?q=$data");
    }
 
    fail("Invalid plugin specified: $plugin", 400);
