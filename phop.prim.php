@@ -5,13 +5,24 @@
 // COMMENT LINE BELOW WHEN DONE TESTING
 define("RGX_REAL", '[0-9]+\\.?[0-9]*');
 define('RGX_PRIMNAME', '/^(?<type>[a-z]+)(?<params>.+?)$/i');
-define('RGX_PRIMWALL', '/(?<x>'.RGX_REAL.')(x(?<y>'.RGX_REAL.'))?(?<p>p)?/i');
+define('RGX_PRIMFLAT', '/(?<x>'.RGX_REAL.')(x(?<y>'.RGX_REAL.'))?(?<p>p)?/i');
+
+// Geometry maths
 define('MIN_VALUE', 0.001);
-define('MM_X', (float)2000);
+define('MAX_VALUE', 32.0);
+define('MM_X', (float)1000);
 define('MM_Y', (float)1000);
 define('MM_UV', (float)100);
-require_once('phop.lib.php');
 
+// Flat types
+define('TYPE_WALL', 'wall');
+define('TYPE_PANEL', 'panel');
+define('TYPE_FLOOR', 'floor');
+define('TYPE_FLAT', 'flat');
+define('TYPE_TRIANGLE', 'triangle');
+define('TYPE_TRIFLOOR', 'trifloor');
+
+require_once('phop.lib.php');
 
 function main() {
    $Q = $_GET['q'];
@@ -34,13 +45,34 @@ function main() {
       case 'w':
       case 'wll':
       case 'wall':
-         $prim = primWall($params);
+         $prim = primFlat($params, TYPE_WALL);
          break;
 
       case 'p':
       case 'pan':
       case 'panel':
-         $prim = primWall($params, true);
+         $prim = primFlat($params, TYPE_PANEL);
+         break;
+
+      case 'f':
+      case 'flr':
+      case 'floor':
+         $prim = primFlat($params, TYPE_FLOOR);
+         break;
+
+      case 'flt':
+      case 'flat':
+         $prim = primFlat($params, TYPE_FLAT);
+         break;
+
+      case 'tri':
+      case 'triangle':
+         $prim = primFlat($params, TYPE_TRIANGLE);
+         break;
+
+      case 'triflr':
+      case 'trifloor':
+         $prim = primFlat($params, TYPE_TRIFLOOR);
          break;
 
       default:
@@ -58,73 +90,82 @@ function main() {
    gotoFile(PRIMS, $Q.".zip");
 }
 
-function primWall($values, $isPanel) {
+function primFlat($values, $type) {
    $dim;
-   if (!preg_match(RGX_PRIMWALL, $values[0], $dim))
-      return fail("Invalid wall primitive syntax", 400);
+   if (!preg_match(RGX_PRIMFLAT, $values[0], $dim))
+      return fail("Invalid Flat primitive syntax", 400);
 
    // Dimension checking (reads values as mm)
    $rawX = (float)$dim[x];
    $rawY = (float)pickNum($dim[y], $rawX);
-   $dimX = $rawX / MM_X;
-   $dimY = $rawY / MM_Y;
+
+   $dimXFactor = 2;
+   $dimYFactor = ($type === TYPE_FLAT || $type === TYPE_FLOOR || $type === TYPE_TRIFLOOR)
+      ? 2
+      : 1;
+
+   $dimX = $rawX / (MM_X*$dimXFactor);
+   $dimY = $rawY / (MM_Y*$dimYFactor);
 
    if ($dimX < MIN_VALUE || $dimY < MIN_VALUE)
-      return fail("Wall primitive too small", 400);
+      return fail("Flat primitive too small", 400);
+
+   if ($dimX > MAX_VALUE || $dimY > MAX_VALUE)
+      return fail("Flat primitive too large", 400);
 
    // Optional parameters (tag + UV planar scaling)
    $phantom = e($dim['p']) ? 'on' : 'off';
    $tag = parseTagNumber(pick($values[1], 200));
-   if ($isPanel) {
-      if (e($values[2])) {
-         $uvX = 1;
-         $uvY = 1;
-      } else if ( e($values[3]) && is_numeric($values[2]) ) {
-         $uvX = (float)$values[2];
-         $uvY = (float)$values[2];
-      } else if (is_numeric($values[3])) {
-         $uvX = (float)$values[2];
-         $uvY = (float)$values[3];
-      } else {
-         fail("Invalid panel parameters", 400);
-      }
-   } else {
-      if (e($values[2])) {
-         $uvX = $rawX / (MM_UV / 1);
-         $uvY = $rawY / (MM_UV / 1);
-      } else if ( e($values[3]) && is_numeric($values[2]) ) {
-         $uvX = $rawX / (MM_UV / (float)$values[2]);
-         $uvY = $rawY / (MM_UV / (float)$values[2]);
-      } else if (is_numeric($values[3])) {
-         $uvX = $rawX / (MM_UV / (float)$values[2]);
-         $uvY = $rawY / (MM_UV / (float)$values[3]);
-      } else {
-         fail("Invalid wall parameters", 400);
-      }
-   }
+   $uv = ($type === TYPE_FLAT || $type === TYPE_PANEL)
+      ? uvFill($values[2], $values[3])
+      : uvPlanar($values[2], $values[3], $rawX, $rawY);
 
    // Generate using template
-   debug('Wall', "Dimensions: $dimX by $dimY, tag: $tag, uvX scale: $uvX, uvY scale: $uvY, collision: $phantom");
-   $template = $isPanel ? getPrimTemplate('panel') : getPrimTemplate('wall');
-   $prim = sprintf($template, $dimX, $dimY, $tag, $uvX, $uvY, $phantom);
+   debug('Flat', "Type: $type");
+   debug('Flat', "Dimensions: $dimX by $dimY, tag: $tag, uvX scale: $uvX, uvY scale: $uvY, collision: $phantom");
+   $template = getPrimTemplate($type);
+   $prim = sprintf($template, $dimX, $dimY, $tag, $uv[0], $uv[1], $phantom);
 
-   debug('Wall', "Generated: $prim");
+   debug('Flat', "Generated: $prim");
    return $prim;
 }
 
-function getPrimTemplate($template) {
-   return file_get_contents(TEMPLATES.$template.'.txt');
-}
-
-function failPrim($type) {
-   fail("Error generating primitive of type $type", 400);
-}
-
-/**
- * Alias to getLocalFile, for the PRIMS folder
+/*
+ * MATH / RWX
  */
-function getLocalPrim($name) {
-   return getLocalFile(PRIMS,$name);
+
+function uvFill($x, $y) {
+   if ( e($x) ) {
+      $uvX = 1;
+      $uvY = 1;
+   } else if ( is_numeric($x) && e($y) ) {
+      $uvX = (float)$x;
+      $uvY = (float)$x;
+   } else if ( is_numeric($y) ) {
+      $uvX = (float)$y;
+      $uvY = (float)$y;
+   } else {
+      return fail("Invalid UV parameters", 400);
+   }
+
+   return [$uvX, $uvY];
+}
+
+function uvPlanar($x, $y, $rawX, $rawY) {
+   if ( e($x) ) {
+      $uvX = $rawX / (MM_UV / 1);
+      $uvY = $rawY / (MM_UV / 1);
+   } else if ( is_numeric($x) && e($y) ) {
+      $uvX = $rawX / (MM_UV / (float)$x);
+      $uvY = $rawY / (MM_UV / (float)$x);
+   } else if ( is_numeric($y) ) {
+      $uvX = $rawX / (MM_UV / (float)$y);
+      $uvY = $rawY / (MM_UV / (float)$y);
+   } else {
+      return fail("Invalid UV parameters", 400);
+   }
+
+   return [$uvX, $uvY];
 }
 
 function parseTagNumber($val) {
@@ -140,6 +181,29 @@ function parseTagNumber($val) {
          else
             return $val;
    }
+}
+
+/*
+ * FILES
+ */
+
+function getPrimTemplate($template) {
+   return file_get_contents(TEMPLATES.$template.'.txt');
+}
+
+/**
+ * Alias to getLocalFile, for the PRIMS folder
+ */
+function getLocalPrim($name) {
+   return getLocalFile(PRIMS,$name);
+}
+
+/*
+ * REDIRECTION
+ */
+
+function failPrim($type) {
+   fail("Error generating primitive of type $type", 400);
 }
 
 main();
