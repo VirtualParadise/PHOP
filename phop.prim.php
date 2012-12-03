@@ -159,7 +159,7 @@ function uvPlanar($x, $y, $rawX, $rawY) {
       $uvX = $rawX / (MM_UV / (float)$x);
       $uvY = $rawY / (MM_UV / (float)$x);
    } else if ( is_numeric($y) ) {
-      $uvX = $rawX / (MM_UV / (float)$y);
+      $uvX = $rawX / (MM_UV / (float)$x);
       $uvY = $rawY / (MM_UV / (float)$y);
    } else {
       return fail("Invalid UV parameters", 400);
