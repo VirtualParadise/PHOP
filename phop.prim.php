@@ -2,7 +2,6 @@
 // PHOP Prim Generator - Roy Curtis
 // Adapted from original design by Epsilion
 //
-// COMMENT LINE BELOW WHEN DONE TESTING
 define("RGX_REAL", '[0-9]+\\.?[0-9]*');
 define('RGX_PRIMNAME', '/^(?<type>[a-z]+)(?<params>.+?)$/i');
 define('RGX_PRIMFLAT', '/(?<x>'.RGX_REAL.')(x(?<y>'.RGX_REAL.'))?(?<p>p)?/i');

@@ -12,13 +12,13 @@ function main() {
    $file = $parts[1];
 
    debug('Incoming', "Query: $q, Dir: $dir, File: $file");
-   // Reject empty directories
-   if (empty($dir))
+   // Reject invalid directories
+   if (!is_dir($dir))
       return fail("Invalid directory", 400);
 
    // Redirect directory requests
    if (empty($file))
-      return gotoUrl($dir);
+      return gotoUrl("phop.indexer.php?q=$dir");
 
    // If plugin token found, redirect to plugins
    if (strpos($file, ':') !== false)

@@ -69,11 +69,15 @@ function gotoUrl($url) {
    exit;
 }
 
-function fail($msg, $code) {
+function fail($msg, $code, $print) {
    debug('Response', "Failing with $code, $msg");
    header("Status: $msg", true, $code);
+
+   if ($print) echo "Error $code: $msg";
    exit(1);
 }
+
+
 
 main();
 ?>
