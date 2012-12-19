@@ -9,6 +9,7 @@ define("PRIMS", "prims/");
 // Debug
 define("SAPI", php_sapi_name());
 define("CLI", 'cli-server');
+define("CACHING", true);
 define("LOGGING", false);
 define("LOGFILE", 'log.txt');
 // Remote paths

@@ -11,7 +11,7 @@ function main() {
    $dir = $parts[0];
    $file = $parts[1];
 
-   debug('Incoming', "Query: $q, Dir: $dir, File: $file");
+   debug('Incoming', "Query: $Q, Dir: $dir, File: $file");
    // Reject invalid directories
    if (!is_dir($dir))
       return fail("Invalid directory", 400);
@@ -25,7 +25,7 @@ function main() {
       return getPlugin($dir, $file);
 
    // Check for cached file
-   if (getLocalFile($dir, $file) === true)
+   if (CACHING && getLocalFile($dir, $file) === true)
       return gotoFile($dir, $file);
 
    // No success? Fetch remotely and cache...
@@ -63,12 +63,23 @@ function getRemoteFile($req, &$fileData) {
    global $REMOTE_PATHS;
 
    foreach ($REMOTE_PATHS as $path) {
-      debug('Remote', "Fetching $req from ".SOURCE);
-      $c = curl_init(SOURCE . $req);
+      debug('Remote', "Fetching $path$req");
+      $c = curl_init($path . $req);
       curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
 
       $fileData = curl_exec($c);
+      $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+      $errNo = curl_errno($c);
+      $err = curl_error($c);
       curl_close($c);
+
+      if ($errNo != 0) {
+         debug('Remote', "Curl error retriving $path$req : $err (code $errNo)");
+         continue;
+      } else if ($code == 404 || $code == 403) {
+         debug('Remote', "HTTP error retriving $path$req : $code");
+         continue;
+      }
 
       if ($fileData !== false)
          return true;
