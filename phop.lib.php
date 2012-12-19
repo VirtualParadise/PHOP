@@ -3,21 +3,28 @@
 //
 // COMMENT LINE BELOW WHEN DONE TESTING
 error_reporting(0);
-// Paths
-define("SOURCE", "http://objects.activeworlds.com");
-define("LOCAL", "http://objectpath.org/op/");
 // Directories
 define("TEMPLATES", "templates/");
 define("PRIMS", "prims/");
 // Debug
 define("SAPI", php_sapi_name());
 define("CLI", 'cli-server');
+define("LOGGING", false);
+define("LOGFILE", 'log.txt');
+// Remote paths
+$REMOTE_PATHS = Array(
+   "http://objects.activeworlds.com/aw",
+   "http://objects.activeworlds.com/mars");
 
 /**
  * Writes message to PHP CLI console, useful for webserver
  */
 function debug($tag, $msg) {
-   if (SAPI == CLI) error_log("[$tag] $msg");
+   if (SAPI == CLI)
+      error_log("[$tag] $msg");
+
+   if (LOGGING)
+      file_put_contents(LOGFILE, "[$_SERVER[REMOTE_ADDR], $tag] $msg\n", FILE_APPEND);
 }
 
 /*
@@ -61,7 +68,16 @@ function cacheFile($dir, $file, $data) {
  * RESPONSE FUNCTIONS
  */
 
-function gotoFile($dir, $file) { gotoUrl("$dir/$file"); }
+function gotoFile($dir, $file) {
+   debug('Response', "Returning file $file");
+   header('Content-Type: application/octet-stream');
+   header('Content-Disposition: attachment; filename='.$file);
+   ob_clean();
+   flush();
+   readfile("$dir/$file");
+   exit;
+}
+
 function gotoUrl($url) {
    debug('Response', "Redirecting to $url");
    header("HTTP/1.1 301 Moved Permanently", true, 301);
@@ -69,15 +85,13 @@ function gotoUrl($url) {
    exit;
 }
 
-function fail($msg, $code, $print) {
+function fail($msg, $code, $print = false) {
    debug('Response', "Failing with $code, $msg");
    header("Status: $msg", true, $code);
 
    if ($print) echo "Error $code: $msg";
    exit(1);
 }
-
-
 
 main();
 ?>

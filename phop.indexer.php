@@ -84,7 +84,7 @@ function getIndex($idxFile) {
 }
 
 function generateIndex($dir, $idxFile) {
-   $files = [];
+   $files = Array();
 
    if ($handle = opendir($dir)) {
        while (false !== ($entry = readdir($handle)))
@@ -105,7 +105,7 @@ function generateEntry($dir, $file) {
    $path = pathinfo($filepath);
    $file = $path['filename'];
    $modified = filemtime($filepath);
-   $contents = [];
+   $contents = Array();
 
    if ($path['extension'] == 'zip') {
       $zip = new ZipArchive();

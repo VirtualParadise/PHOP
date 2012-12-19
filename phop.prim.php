@@ -141,13 +141,13 @@ function uvFill($x, $y) {
       $uvX = (float)$x;
       $uvY = (float)$x;
    } else if ( is_numeric($y) ) {
-      $uvX = (float)$y;
+      $uvX = (float)$x;
       $uvY = (float)$y;
    } else {
       return fail("Invalid UV parameters", 400);
    }
 
-   return [$uvX, $uvY];
+   return Array($uvX, $uvY);
 }
 
 function uvPlanar($x, $y, $rawX, $rawY) {
@@ -164,7 +164,7 @@ function uvPlanar($x, $y, $rawX, $rawY) {
       return fail("Invalid UV parameters", 400);
    }
 
-   return [$uvX, $uvY];
+   return Array($uvX, $uvY);
 }
 
 function parseTagNumber($val) {
@@ -194,7 +194,14 @@ function getPrimTemplate($template) {
  * Alias to getLocalFile, for the PRIMS folder
  */
 function getLocalPrim($name) {
-   return getLocalFile(PRIMS,$name);
+   $prim = getLocalFile(PRIMS,$name);
+
+   if ($prim === false)
+      return false;
+   else if (filemtime(__FILE__) > filemtime($prim))
+      return false;
+   else
+      return true;
 }
 
 /*

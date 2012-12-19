@@ -60,15 +60,22 @@ function getPlugin($dir, $file) {
 }
 
 function getRemoteFile($req, &$fileData) {
-   debug('Remote', "Fetching $req from ".SOURCE);
-   $c = curl_init(SOURCE . $req);
-   curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+   global $REMOTE_PATHS;
 
-   $fileData = curl_exec($c);
-   $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
-   curl_close($c);
+   foreach ($REMOTE_PATHS as $path) {
+      debug('Remote', "Fetching $req from ".SOURCE);
+      $c = curl_init(SOURCE . $req);
+      curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
 
-   return ($code != 403 && $code != 404);
+      $fileData = curl_exec($c);
+      curl_close($c);
+
+      if ($fileData !== false)
+         return true;
+   }
+
+   debug('Remote', "No remote sources had $req");
+   return false;
 }
 
 main();
