@@ -18,6 +18,7 @@ define('TYPE_WALL', 'wall');
 define('TYPE_PANEL', 'panel');
 define('TYPE_FLOOR', 'floor');
 define('TYPE_FLAT', 'flat');
+define('TYPE_FACER', 'facer');
 define('TYPE_TRIANGLE', 'triangle');
 define('TYPE_TRIFLOOR', 'trifloor');
 
@@ -62,6 +63,11 @@ function main() {
       case 'flt':
       case 'flat':
          $prim = primFlat($params, TYPE_FLAT);
+         break;
+
+      case 'fac':
+      case 'facer':
+         $prim = primFlat($params, TYPE_FACER);
          break;
 
       case 'tri':
@@ -115,7 +121,7 @@ function primFlat($values, $type) {
    // Optional parameters (tag + UV planar scaling)
    $phantom = e($dim['p']) ? 'on' : 'off';
    $tag = parseTagNumber(pick($values[1], 200));
-   $uv = ($type === TYPE_FLAT || $type === TYPE_PANEL)
+   $uv = ($type === TYPE_FLAT || $type === TYPE_PANEL || $type === TYPE_FACER)
       ? uvFill($values[2], $values[3])
       : uvPlanar($values[2], $values[3], $rawX, $rawY);
 

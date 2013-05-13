@@ -1,23 +1,21 @@
 <?php
 // PHOP - Roy Curtis
-//
-// COMMENT LINE BELOW WHEN DONE TESTING
 require_once('phop.lib.php');
 
 function main() {
-   debug('PHOP', 'v.006');
-   $Q = $_GET['q'];
-   $parts = explode("/", $Q, 2);
-   $dir = $parts[0];
-   $file = $parts[1];
+   debug('PHOP', 'v.007');
+   $Q     = $_GET['q'];
+   $parts = explode("/", trim($Q, "/"), 2);
+   $dir   = $parts[0];
+   $file  = $parts[1];
 
    debug('Incoming', "Query: $Q, Dir: $dir, File: $file");
    // Reject invalid directories
-   if (!is_dir($dir))
+   if ( !is_dir($dir) )
       return fail("Invalid directory", 400);
 
    // Redirect directory requests
-   if (empty($file))
+   if ( empty($file) )
       return gotoUrl("phop.indexer.php?q=$dir");
 
    // If plugin token found, redirect to plugins
@@ -30,12 +28,13 @@ function main() {
 
    // No success? Fetch remotely and cache...
    $fileData;
-   if (getRemoteFile($Q, $fileData) === true) {
+   if (getRemoteFile($Q, $fileData) === true)
+   {
       cacheFile($dir, $file, $fileData);
       gotoFile($dir, $file);
-   } else {
-      fail("Not found", 404);
    }
+   else
+      fail("Not found", 404);
 }
 
 /*

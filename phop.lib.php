@@ -14,8 +14,8 @@ define("LOGGING", false);
 define("LOGFILE", 'log.txt');
 // Remote paths
 $REMOTE_PATHS = Array(
-   "http://objects.activeworlds.com/aw",
-   "http://objects.activeworlds.com/mars");
+   "http://awcommunity.org/romperroom/",
+   "http://aw.platform3d.com/multipath/");
 
 /**
  * Writes message to PHP CLI console, useful for webserver
@@ -71,11 +71,17 @@ function cacheFile($dir, $file, $data) {
 
 function gotoFile($dir, $file) {
    debug('Response', "Returning file $file");
-   header('Content-Type: application/octet-stream');
-   header('Content-Disposition: attachment; filename='.$file);
+
+   $path   = "$dir/$file";
+   $length = filesize ($path);
+   //header("Connection: Keep-alive", true);
+   header('Content-Type: application/octet-stream', true);
+   header("Content-Length: $length", true);
+   header("Content-Disposition: attachment; filename=\"$file\"", true);
+
    ob_clean();
    flush();
-   readfile("$dir/$file");
+   readfile($path);
    exit;
 }
 

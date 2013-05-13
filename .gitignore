@@ -1,3 +1,6 @@
 models/
 textures/
 prims/
+PHOP.sublime*
+test.html
+*.db

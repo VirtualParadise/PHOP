@@ -12,7 +12,8 @@ function main() {
    $index;
 
    // Check for rebuild query
-   if (isset($_GET['rebuild'])) {
+   if ( isset($_GET['rebuild']) )
+   {
       debug('Indexer', 'Rebuilding index...');
       $index = generateIndex($dir, $idxFile);
       $messages = 'Index rebuilt.';
@@ -55,12 +56,14 @@ EOD;
 
 function viewListing($data, $dir, $messages = null) {
    $html = "<h1>Listing for $dir:</h1><pre>";
-   foreach($data as $row) {
-      $row = explode(',',$row);
-      $mod = "modified: $row[1]";
-      $zip = e($row[2]) ? '' : ", has: $row[2]";
+   foreach($data as $row)
+   {
+      $row  = explode(',',$row);
+      $file = "<a href='$dir/$row[0]'>$row[0]</a>";
+      $mod  = "modified: $row[1]";
+      $zip  = e($row[2]) ? '' : ", has: $row[2]";
 
-      $html .= "$row[0], $mod$zip\n";
+      $html .= "$file, $mod$zip\n";
    }
 
    return $html."</pre>";
@@ -86,8 +89,9 @@ function getIndex($idxFile) {
 function generateIndex($dir, $idxFile) {
    $files = Array();
 
-   if ($handle = opendir($dir)) {
-       while (false !== ($entry = readdir($handle)))
+   if ( $handle = opendir($dir) )
+   {
+       while ( false !== ($entry = readdir($handle)) )
             if ($entry != "." && $entry != "..")
                array_push($files, generateEntry($dir, $entry));
 
@@ -100,10 +104,11 @@ function generateIndex($dir, $idxFile) {
 }
 
 // Spec: $file, $modified, $zip contents
-function generateEntry($dir, $file) {
+function generateEntry($dir, $file)
+{
    $filepath = "./$dir/$file";
-   $path = pathinfo($filepath);
-   $file = $path['filename'];
+   $path     = pathinfo($filepath);
+   $file     = $path['basename'];
    $modified = filemtime($filepath);
    $contents = Array();
 
