@@ -1,8 +1,11 @@
 <?php
-// PHOP Prim Generator - Roy Curtis
-// Adapted from original design by Epsilion
-//
-define("RGX_REAL", '[0-9]+\\.?[0-9]*');
+/**
+ * PHOP - Prim Generator
+ * Adapted from original design by Epsilion
+ */
+require_once('phop.lib.php');
+
+define("RGX_REAL",     '[0-9]+\\.?[0-9]*');
 define('RGX_PRIMNAME', '/^(?<type>[a-z]+)(?<params>.+?)$/i');
 define('RGX_PRIMFLAT', '/(?<x>'.RGX_REAL.')(x(?<y>'.RGX_REAL.'))?(?<p>p)?/i');
 
@@ -22,9 +25,8 @@ define('TYPE_FACER', 'facer');
 define('TYPE_TRIANGLE', 'triangle');
 define('TYPE_TRIFLOOR', 'trifloor');
 
-require_once('phop.lib.php');
-
-function main() {
+function main()
+{
    $Q = $_GET['q'];
    $fileName = $Q.".zip";
 
@@ -84,7 +86,7 @@ function main() {
          return fail("Unknown primitive type: $type", 400);
    }
 
-   if (e($prim))
+   if ( empty($prim) )
       return fail("Unknown error", 500);
 
    $zip = new ZipArchive();
@@ -119,7 +121,7 @@ function primFlat($values, $type) {
       return fail("Flat primitive too large", 400);
 
    // Optional parameters (tag + UV planar scaling)
-   $phantom = e($dim['p']) ? 'on' : 'off';
+   $phantom = empty($dim['p']) ? 'on' : 'off';
    $tag = parseTagNumber(pick($values[1], 200));
    $uv = ($type === TYPE_FLAT || $type === TYPE_PANEL || $type === TYPE_FACER)
       ? uvFill($values[2], $values[3])
@@ -140,10 +142,10 @@ function primFlat($values, $type) {
  */
 
 function uvFill($x, $y) {
-   if ( e($x) ) {
+   if ( empty($x) ) {
       $uvX = 1;
       $uvY = 1;
-   } else if ( is_numeric($x) && e($y) ) {
+   } else if ( is_numeric($x) && empty($y) ) {
       $uvX = (float)$x;
       $uvY = (float)$x;
    } else if ( is_numeric($y) ) {
@@ -157,10 +159,10 @@ function uvFill($x, $y) {
 }
 
 function uvPlanar($x, $y, $rawX, $rawY) {
-   if ( e($x) ) {
+   if ( empty($x) ) {
       $uvX = $rawX / (MM_UV / 1);
       $uvY = $rawY / (MM_UV / 1);
-   } else if ( is_numeric($x) && e($y) ) {
+   } else if ( is_numeric($x) && empty($y) ) {
       $uvX = $rawX / (MM_UV / (float)$x);
       $uvY = $rawY / (MM_UV / (float)$x);
    } else if ( is_numeric($y) ) {

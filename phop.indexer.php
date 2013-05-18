@@ -1,30 +1,23 @@
 <?php
-// PHOP Indexer - Roy Curtis
-// Adapted from original design by Epsilion
-//
-define("INDEX", ".index.db");
+/**
+ * PHOP - Directory indexer
+ */
 require_once('phop.lib.php');
+require_once('phop.views.php');
 
-function main() {
-   $dir = str_replace('/','',$_GET['q']);
-   $idxFile = $dir.INDEX;
-   $messages;
+function main()
+{
+   $query = $_GET['q'];
+   $dir   = str_replace('/','', $query);
    $index;
 
-   // Check for rebuild query
-   if ( isset($_GET['rebuild']) )
-   {
-      debug('Indexer', 'Rebuilding index...');
-      $index = generateIndex($dir, $idxFile);
-      $messages = 'Index rebuilt.';
-   }
-
    // Reject invalid directories
-   if (!is_dir($dir))
-      return failFancy("Invalid directory", 400);
+   if ( !is_dir($dir) )
+      return indexerFail("Invalid directory", 400);
 
-   $index = e($index) ? getIndex($idxFile) : $index;
-   if ($index === false) {
+   $index = generateIndex($dir);
+   if ($index === false)
+   {
       debug('Indexer', 'Generating index for the first time...');
       $index = generateIndex($dir, $idxFile);
    }
@@ -56,12 +49,16 @@ EOD;
 
 function viewListing($data, $dir, $messages = null) {
    $html = "<h1>Listing for $dir:</h1><pre>";
+
    foreach($data as $row)
    {
       $row  = explode(',',$row);
       $file = "<a href='$dir/$row[0]'>$row[0]</a>";
       $mod  = "modified: $row[1]";
-      $zip  = e($row[2]) ? '' : ", has: $row[2]";
+      $zip  =
+         empty($row[2])
+         ? ''
+         : ", has: $row[2]";
 
       $html .= "$file, $mod$zip\n";
    }
@@ -79,57 +76,68 @@ function viewFooter($dir, $idx) {
  * INDEX
  */
 
-function getIndex($idxFile) {
-   if (is_file($idxFile))
-      return file($idxFile, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
-   else
-      return false;
-}
-
-function generateIndex($dir, $idxFile) {
-   $files = Array();
+function generateIndex(string $dir)
+{
+   $files = [];
 
    if ( $handle = opendir($dir) )
    {
-       while ( false !== ($entry = readdir($handle)) )
-            if ($entry != "." && $entry != "..")
-               array_push($files, generateEntry($dir, $entry));
+      while ( true )
+      {
+         $file = readdir($handle);
+
+         // Finished iterating directory
+         if      ($file === false)
+            break;
+
+         // Process file entry
+         if ($file != "." && $file != "..")
+         {
+            $entry = generateEntry($dir, $file);
+            array_push($files, $file);
+         }
+      }
 
        closedir($handle);
    }
 
    natsort($files);
-   file_put_contents($idxFile, implode("\n", $files));
    return $files;
 }
 
-// Spec: $file, $modified, $zip contents
-function generateEntry($dir, $file)
+function generateEntry(string $dir, string $file)
 {
    $filepath = "./$dir/$file";
    $path     = pathinfo($filepath);
    $file     = $path['basename'];
    $modified = filemtime($filepath);
-   $contents = Array();
+   $contents = [];
 
-   if ($path['extension'] == 'zip') {
+   // Explore contents of zip files
+   if ($path['extension'] == 'zip')
+   {
       $zip = new ZipArchive();
       $zip->open($filepath);
 
-      for ($i=0; $i < $zip->numFiles; $i++)
+      for ($i = 0; $i < $zip->numFiles; $i++)
           array_push($contents, $zip->getNameIndex($i));
 
       $zip->close();
    }
 
-   return "$file,$modified,".implode(' ', $contents);
+   return [
+      'File'     => $file,
+      'Modified' => $modified,
+      'Contents' => $contents
+   ];
 }
 
 /*
  * REDIRECTION
  */
 
-function failFancy($msg, $code) {
+function indexerFail($msg, $code)
+{
    debug('Response', "Failing with $code, $msg");
    header("Status: $msg", true, $code);
    echo viewCore("Error $error",$msg,"~");

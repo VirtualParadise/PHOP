@@ -1,15 +1,29 @@
 <?php
-// PHOP - Roy Curtis
-require_once('phop.lib.php');
+/**
+ * PHOP - Main routing script
+ */
+require_once 'logic/PHOP.php';
 
-function main() {
-   debug('PHOP', 'v.007');
-   $Q     = $_GET['q'];
-   $parts = explode("/", trim($Q, "/"), 2);
-   $dir   = $parts[0];
-   $file  = $parts[1];
+function main()
+{
+   debug('PHOP', PHOP);
 
-   debug('Incoming', "Query: $Q, Dir: $dir, File: $file");
+   if ( !isset($_GET['q']) )
+      return gotoView(Views::Main);
+
+   $query  = trim($_GET['q']);
+   $parts;
+
+   // Break down request into parts
+   preg_match(Regexes::AssetRequest, $query, $parts);
+   $dir  = $parts['dir'];
+   $file = $parts['file'];
+
+   debug('Incoming', "Query: $query, Dir: $dir, File: $file");
+
+   if ( empty($dir) )
+      return gotoView(Views::Main);
+
    // Reject invalid directories
    if ( !is_dir($dir) )
       return fail("Invalid directory", 400);
@@ -23,7 +37,7 @@ function main() {
       return getPlugin($dir, $file);
 
    // Check for cached file
-   if (CACHING && getLocalFile($dir, $file) === true)
+   if (CACHING && isLocalFile($dir, $file))
       return gotoFile($dir, $file);
 
    // No success? Fetch remotely and cache...
@@ -41,10 +55,11 @@ function main() {
  * FETCH FUNCTIONS
  */
 
-function getPlugin($dir, $file) {
-   $parts = explode(":", $file, 2);
+function getPlugin($dir, $file)
+{
+   $parts  = explode(":", $file, 2);
    $plugin = $parts[0];
-   $data = $parts[1];
+   $data   = $parts[1];
 
    debug('Plugin', "Requested: $plugin, Data: $data");
    switch ($plugin) {
@@ -59,9 +74,9 @@ function getPlugin($dir, $file) {
 }
 
 function getRemoteFile($req, &$fileData) {
-   global $REMOTE_PATHS;
+   global $RemotePaths;
 
-   foreach ($REMOTE_PATHS as $path) {
+   foreach ($RemotePaths as $path) {
       debug('Remote', "Fetching $path$req");
       $c = curl_init($path . $req);
       curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
