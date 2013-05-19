@@ -20,6 +20,7 @@ function cacheFile($dir, $file, $data)
 
    $path = pathJoin([$dir, $file]);
    file_put_contents($path, $data);
+   chmod($path, 0666);
 }
 
 ?>

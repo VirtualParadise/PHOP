@@ -1,0 +1,154 @@
+/**
+ * Colors
+ */
+@colFontText:     #ffeeee;
+@colFontShadow:   #000;
+@colFontEmphasis: red;
+@colBgMain:       #151515;
+@colBgDim:        #440000;
+@colBgFocus:      #cc0000;
+@colBgHover:      white;
+
+.stateHover
+{
+   background:  @colBgHover;
+   color:       black;
+   text-shadow: none;
+
+   .caret
+   {
+      border-top-color:    black;
+      border-bottom-color: black;
+   }
+}
+
+.stateClick
+{
+   background:  black;
+   color:       white;
+   text-shadow: none;
+
+   .caret
+   {
+      border-top-color:    white !important;
+      border-bottom-color: white !important;
+   }
+}
+
+.gradient (@startColor: #eee, @endColor: white)
+{
+   background-color: @endColor;
+   background:       -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
+   background:       -webkit-linear-gradient(top, @startColor, @endColor);
+   background:       -moz-linear-gradient(top, @startColor, @endColor);
+   background:       -ms-linear-gradient(top, @startColor, @endColor);
+   background:       -o-linear-gradient(top, @startColor, @endColor);
+}
+
+/**
+ * Elements
+ */
+body
+{
+   background:  @colBgMain;
+   font-family: 'Merriweather Sans', 'Segoe UI', sans-serif;
+}
+
+body, h1 small
+{
+   color: @colFontText;
+}
+
+/**
+ * Controls
+ */
+.navbar-inner
+{
+   background: none;
+   border:     none;
+
+   .nav > li
+   {
+      a
+      {
+         .gradient(@colBgDim * 0.8, @colBgDim);
+         color:       @colFontText;
+         text-shadow: 0 1px 0 @colFontShadow;
+
+         &:hover  { .stateHover; }
+         &:active { .stateClick; }
+      }
+
+      &.active a
+      {
+         .gradient(@colBgFocus * 0.8, @colBgFocus);
+         color:       @colFontText;
+         text-shadow: 0 1px 0 #aa0000;
+
+         &:hover  { .stateHover; }
+         &:active { .stateClick; }
+      }
+   }
+
+   .nav > li.dropdown
+   {
+      .dropdown-toggle
+      {
+         .caret
+         {
+            border-top-color:    @colFontText;
+            border-bottom-color: @colFontText;
+         }
+      }
+
+      &.open > .dropdown-toggle
+      {
+         color: @colFontText;
+
+         &:hover  { .stateHover; }
+         &:active { .stateClick; }
+
+         .caret
+         {
+            border-top-color:    @colFontText;
+            border-bottom-color: @colFontText;
+         }
+
+         .dropdown-menu
+         {
+            background: @colBgDim;
+         }
+      }
+   }
+}
+
+/**
+ * Header
+ */
+body > header
+{
+   color:         @colFontEmphasis;
+   background:    black;
+   border-bottom: 5px @colBgFocus solid;
+}
+
+body > header .navbar
+{
+   margin-bottom: 0px;
+}
+
+/**
+ * Footer
+ */
+body > footer
+{
+   .container
+   {
+      text-align:  center;
+      font-style:  italic;
+      color:       @colBgMain * 3;
+      border-top:  2px solid @colBgMain * 2;
+      margin-top:  100px;
+      padding-top: 10px;
+   }
+}

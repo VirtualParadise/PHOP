@@ -7,4 +7,6 @@ if ( !defined('PHOP') )
    exit;
 ?>
 
-hello
+<div class="container">
+   Hoi
+</div>
