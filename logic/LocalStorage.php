@@ -19,4 +19,21 @@ function isLocalFile($dir, $file)
    return realpath($path) !== false;
 }
 
+/**
+ * Counts number of entries in a given directory
+ *
+ * @param  string  $dir Target directory to check
+ * @return integer Amount of items in directory
+ */
+function getDirectoryCount($dir)
+{
+   $count = 0;
+   $list  = new DirectoryIterator($dir);
+
+   foreach($list as $file)
+      $count++;
+
+   return $count;
+}
+
 ?>

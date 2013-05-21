@@ -3,16 +3,18 @@
  * PHOP - Main routing script
  */
 require_once 'logic/PHOP.php';
+require_once 'logic/Debug.php';
+require_once 'logic/Routes.php';
+require_once 'logic/Views.php';
 
 function main()
 {
    debug('PHOP', PHOP);
 
    if ( !isset($_GET['q']) )
-      return gotoView(Views::Main);
+      gotoView(Views::Main);
 
-   $query  = trim($_GET['q']);
-   $parts;
+   $query = trim($_GET['q']);
 
    // Break down request into parts
    preg_match(Regexes::AssetRequest, $query, $parts);
@@ -22,23 +24,23 @@ function main()
    debug('Incoming', "Query: $query, Dir: $dir, File: $file");
 
    if ( empty($dir) )
-      return gotoView(Views::Main);
+      gotoView(Views::Main);
 
    // Reject invalid directories
    if ( !is_dir($dir) )
-      return fail("Invalid directory", 400);
+      fail("Invalid directory", 400);
 
    // Redirect directory requests
    if ( empty($file) )
-      return gotoUrl("phop.indexer.php?q=$dir");
+      gotoUrl("phop.indexer.php?q=$dir");
 
    // If plugin token found, redirect to plugins
    if (strpos($file, ':') !== false)
-      return getPlugin($dir, $file);
+      getPlugin($dir, $file);
 
    // Check for cached file
    if (CACHING && isLocalFile($dir, $file))
-      return gotoFile($dir, $file);
+      gotoFile($dir, $file);
 
    // No success? Fetch remotely and cache...
    $fileData;
@@ -76,15 +78,16 @@ function getPlugin($dir, $file)
 function getRemoteFile($req, &$fileData) {
    global $RemotePaths;
 
-   foreach ($RemotePaths as $path) {
+   foreach ($RemotePaths as $path)
+   {
       debug('Remote', "Fetching $path$req");
       $c = curl_init($path . $req);
       curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
 
       $fileData = curl_exec($c);
-      $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
-      $errNo = curl_errno($c);
-      $err = curl_error($c);
+      $code     = curl_getinfo($c, CURLINFO_HTTP_CODE);
+      $errNo    = curl_errno($c);
+      $err      = curl_error($c);
       curl_close($c);
 
       if ($errNo != 0) {

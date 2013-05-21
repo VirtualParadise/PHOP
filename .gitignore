@@ -4,3 +4,4 @@ prims/
 PHOP.sublime*
 test.html
 *.db
+.idea/*

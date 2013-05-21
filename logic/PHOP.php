@@ -1,6 +1,6 @@
 <?php
 /**
- * PHOP - Common functions
+ * PHOP - Common functions and data
  */
 error_reporting(E_ALL);
 
@@ -37,6 +37,7 @@ class Directories
    const Templates = 'templates';
    const Prims     = 'prims';
    const Views     = 'views';
+   const Stats     = 'stats';
 }
 
 // Regexes
@@ -73,15 +74,5 @@ function pathJoin(array $entries)
 
    return implode('/', $entries);
 }
-
-
-/**
- * Logic
- */
-require_once 'Debug.php';
-require_once 'LocalStorage.php';
-require_once 'RemoteStorage.php';
-require_once 'Routes.php';
-require_once 'Views.php';
 
 ?>

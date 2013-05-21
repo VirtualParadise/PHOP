@@ -5,7 +5,7 @@
 
 if ( !defined('PHOP') )
    exit;
-
+//
 /**
  * Writes message to PHP CLI console for debugging
  */
