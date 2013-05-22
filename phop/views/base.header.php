@@ -6,6 +6,57 @@
 if ( !defined('PHOP') )
    exit;
 
+/**
+ * Prints the "active" CSS class for the given target menu item, if it is suitable for
+ * the current specified action
+ *
+ * @param string $target Target label of the tab to highlight as active
+ */
+function printActive($target)
+{
+   switch ( getOrBlank($_GET, KeyAction) )
+   {
+      case Actions::Index:
+         if ($target == Actions::Index)
+            goto active;
+         break;
+
+      default:
+         if ($target == Actions::Nothing)
+            goto active;
+         break;
+   }
+
+   return;
+
+   active:
+   echo 'active';
+}
+
+/**
+ * Prints each menu entry corresponding to each allowed asset directory, if they exist.
+ * If none exist or none are configured, prints a disabled menu item instead.
+ */
+function printIndexEntries()
+{
+   $validDirs = [];
+
+   foreach (Config::$AssetDirectories as $dir)
+      if ( is_dir($dir) )
+         array_push($validDirs, $dir);
+
+   if ( empty($validDirs) )
+      echo '<li class="disabled"><a tabindex="-1" href="#">No valid directories configured</a></li>';
+   else
+      foreach ($validDirs as $dir)
+      {
+         $action = Actions::Index;
+         $url    = pathJoin([Config::PublicUrl,"?action=$action&q=/$dir"]);
+         echo "<li><a tabindex=\"-1\" href=\"$url\">$dir</a></li>";
+      }
+
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -31,16 +82,14 @@ if ( !defined('PHOP') )
    <div class="container navbar">
       <div class="navbar-inner">
          <ul class="nav">
-            <li class="active"><a href="">Home</a></li>
-            <li class="dropdown">
+            <li class="<?php printActive(Actions::Nothing) ?>"><a href=".">Home</a></li>
+            <li class="<?php printActive(Actions::Index) ?> dropdown">
                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                   Indexes
                   <b class="caret"></b>
                </a>
                <ul class="dropdown-menu">
-                  <li><a tabindex="-1" href="#">Action</a></li>
-                  <li><a tabindex="-1" href="#">Another action</a></li>
-                  <li><a tabindex="-1" href="#">Something else here</a></li>
+                  <?php printIndexEntries(); ?>
                </ul>
             </li>
          </ul>

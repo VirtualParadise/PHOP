@@ -87,7 +87,7 @@ h1 strong
          &:active { .stateClick; }
       }
 
-      &.active a
+      &.active > a
       {
          .gradient(@colBgFocus * 0.8, @colBgFocus);
          color:       @colFontText;
@@ -110,6 +110,8 @@ h1 strong
          }
       }
 
+      &.active > .dropdown-toggle,
+      &.open.active > .dropdown-toggle,
       &.open > .dropdown-toggle
       {
          color: @colFontText;
@@ -126,6 +128,7 @@ h1 strong
    }
 
    // Top navigation bar dropdown menus
+   .nav > li.dropdown.active > .dropdown-menu,
    .nav > li.dropdown > .dropdown-menu
    {
       background: @colBgDim * 0.9;
@@ -138,6 +141,11 @@ h1 strong
          &:active { .stateClick; }
       }
 
+      li.disabled > a
+      {
+         color: grey;
+      }
+
       &:after
       {
          border-bottom-color: @colBgDim * 0.9;
@@ -147,14 +155,14 @@ h1 strong
 
 .syntax
 {
-  font-family: monospace;
-  font-size:   large;
+   font-family: monospace;
+   font-size:   large;
 
-  .param
-  {
-    color:      @colFontEmphasis;
-    font-style: italic;
-  }
+   .param
+   {
+      color:      @colFontEmphasis;
+      font-style: italic;
+   }
 }
 
 /**
@@ -180,12 +188,13 @@ body > footer
 {
    .container
    {
-      text-align:  center;
-      font-style:  italic;
-      color:       @colBgMain * 3;
-      border-top:  2px solid @colBgMain * 2;
-      margin-top:  50px;
-      padding-top: 10px;
+      text-align:    center;
+      font-style:    italic;
+      color:         @colBgMain * 3;
+      border-top:    2px solid @colBgMain * 2;
+      margin-top:    25px;
+      margin-bottom: 25px;
+      padding-top:   10px;
    }
 }
 
@@ -194,11 +203,11 @@ body > footer
  */
 #default-opurl
 {
-  display:    block;
-  margin-top: 20px;
-  padding:    20px;
-  width:      100%;
-  font-size:  large;
-  box-sizing: border-box;
-  cursor:     text;
+   display:    block;
+   margin-top: 20px;
+   padding:    20px;
+   width:      100%;
+   font-size:  large;
+   box-sizing: border-box;
+   cursor:     text;
 }

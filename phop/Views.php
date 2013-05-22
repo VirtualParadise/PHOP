@@ -9,6 +9,7 @@ if ( !defined('PHOP') )
 class Views
 {
    const Main  = 'default';
+   const Index = 'index';
    const Error = 'error';
 }
 

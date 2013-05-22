@@ -112,7 +112,7 @@ function gotoView($view, array $data = [])
 function gotoError($code, $type, $extra = [])
 {
    debug('Response', "Failing with $code, type: $type");
-   header("Status: $type", true, $code);
+   header("Status: $code $type", true, $code);
 
    if ( isVRClient() )
       exit;

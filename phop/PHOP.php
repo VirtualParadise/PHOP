@@ -3,6 +3,7 @@
  * PHOP - Common functions and data
  */
 error_reporting(E_ALL);
+date_default_timezone_set('UTC');
 
 /**
  * PHOP's configuration, kept in a container object
@@ -13,7 +14,7 @@ class Config
    const Logging = false;
    const LogFile = 'log.txt';
 
-   const PublicUrl = 'http://localhost:8888/';
+   const PublicUrl = 'http://localhost:8888';
 
    static $RemotePaths = [
       "http://awcommunity.org/romperroom",
@@ -49,7 +50,8 @@ class Directories
  */
 class Actions
 {
-   const Index = 'index';
+   const Nothing = 'nothing';
+   const Index   = 'index';
 }
 
 /**
@@ -59,8 +61,8 @@ class Errors
 {
    const BadRequest   = 'Bad request';
    const BadDirectory = 'Invalid directory';
+   const BadAction    = 'Unknown route/action';
    const NotFound     = 'Asset not found';
-   const NotKnown     = 'Unknown route';
    const Unknown      = 'Unknown server error';
 }
 
@@ -70,8 +72,14 @@ class Errors
 class Regexes
 {
    const AssetRequest = '{^/?(?<dir>[a-z]+)/(?<file>.+\.[a-z]+)$}i';
-   const DirRequest   = '{^/?(?<dir>[a-z]+)\b}i';
+   const DirRequest   = '{^/?(?<dir>[a-z]+)/?$}i';
 }
+
+/*
+ * General constants
+ */
+define('KeyAction', 'action');
+define('KeyQuery',  'q');
 
 /*
  * Utility functions

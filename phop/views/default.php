@@ -10,7 +10,7 @@ if ( !defined('PHOP') )
 
 $Data['models']   = getDirectoryCount('models');
 $Data['textures'] = getDirectoryCount('textures');
-$Data['url']      = Config::PublicUrl.'?q=';
+$Data['url']      = pathJoin([Config::PublicUrl,'?q=']);
 ?>
 
 <div class="container">

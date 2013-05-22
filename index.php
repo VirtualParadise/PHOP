@@ -6,6 +6,7 @@
 define('PHOP', .008);
 require_once 'phop/PHOP.php';
 require_once 'phop/Debug.php';
+require_once 'phop/Indexing.php';
 require_once 'phop/LocalStorage.php';
 require_once 'phop/RemoteStorage.php';
 require_once 'phop/Routes.php';
@@ -15,12 +16,11 @@ function main()
 {
    debug('', "\n\n");
    debug('PHOP', PHOP);
-   $action = getOrBlank($_GET, 'action');
-   $query  = getOrBlank($_GET, 'q');
+   $action = getOrBlank($_GET, KeyAction);
+   $query  = getOrBlank($_GET, KeyQuery);
 
    switch ($action)
    {
-      default:
       case '':
          if ( empty($query) )
             routeDefault();
@@ -30,6 +30,10 @@ function main()
 
       case Actions::Index:
          routeIndex($query);
+         break;
+
+      default:
+         gotoError(500, Errors::BadAction);
          break;
    }
 }
@@ -93,13 +97,35 @@ function routeRequest($query)
          gotoData($file, $data, $size);
    }
 
+   // Finally, fail with 404
+   gotoError(404, Errors::NotFound);
+
    // TODO: plugins
-   // TODO: 404
 }
 
 function routeIndex($query)
 {
+   $query = trim($query);
 
+   // Break down request into parts
+   $match = preg_match(Regexes::DirRequest, $query, $matches);
+   $dir   = getOrBlank($matches, 'dir');
+
+   // Reject invalid requests
+   if ( $match === 0 || $match === false )
+   {
+      debug('Indexing', 'Bad request; rejecting with 500' );
+      gotoError(500, Errors::BadRequest);
+   }
+
+   // Reject invalid directories
+   if ( !isDirectory($dir) )
+   {
+      debug('Indexing', 'Bad directory request; rejecting with 500' );
+      gotoError(500, Errors::BadDirectory);
+   }
+
+   gotoIndex($dir);
 }
 
 main();

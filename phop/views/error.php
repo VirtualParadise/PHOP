@@ -48,7 +48,7 @@ if ( !defined('PHOP') )
       case Errors::BadDirectory:
          ?>
          <p>
-            This object path does not serve assets from
+            This object path does not serve or index assets from
             that directory, or the directory itself is missing.
          </p>
 
@@ -70,6 +70,35 @@ if ( !defined('PHOP') )
          }
 
          ?>
+         <?php
+         break;
+
+      /**
+       * Asset not found
+       */
+      case Errors::NotFound:
+         ?>
+         <p>
+            Sorry, the requested asset could not be found
+            in local storage or on the remote paths.
+         </p>
+
+         <p>
+            You may wish to try the indexes via the menu at
+            the top of this page.
+         </p>
+         <?php
+         break;
+
+      /**
+       * Unknown route
+       */
+      case Errors::BadAction:
+         ?>
+         <p>
+            The requested action <code><?php echo $_GET['action'] ?></code>
+            was unrecognized. Please try an option on the top menu.
+         </p>
          <?php
          break;
    }
