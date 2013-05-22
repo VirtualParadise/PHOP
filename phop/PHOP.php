@@ -27,7 +27,8 @@ class Config
    ];
 
    static $Plugins = [
-      "prim"
+      "prim",
+      //"example",
    ];
 }
 

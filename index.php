@@ -9,6 +9,7 @@ require_once 'phop/Debug.php';
 require_once 'phop/Indexing.php';
 require_once 'phop/LocalStorage.php';
 require_once 'phop/RemoteStorage.php';
+require_once 'phop/Plugins.php';
 require_once 'phop/Routes.php';
 require_once 'phop/Views.php';
 
@@ -96,6 +97,8 @@ function routeRequest($query)
       else
          gotoData($file, $data, $size);
    }
+
+   checkPlugins($dir, $file);
 
    // Finally, fail with 404
    gotoError(404, Errors::NotFound);
