@@ -30,20 +30,46 @@ function isVRClient()
  */
 function gotoFile($dir, $file)
 {
-   debug('Response', "Returning file $file");
+   debug('Routing', "Returning file $dir/$file");
 
-   $path   = pathJoin([$dir, $file]);
-   $length = filesize ($path);
+   $path = pathJoin([$dir, $file]);
+   $size = filesize($path);
 
-   header("Connection: keep-alive", true);
-   header('Content-Type: application/octet-stream', true);
-   header("Content-Length: $length", true);
-   header("Content-Disposition: attachment; filename=\"$file\"", true);
-
-   ob_clean();
-   flush();
+   sendHeaders($file, $size);
    readfile($path);
    exit;
+}
+
+/**
+ * Feeds raw data to the requesting client
+ *
+ * @param $file
+ * @param $data
+ * @param $size
+ */
+function gotoData($file, $data, $size)
+{
+   debug('Routing', "Returning raw data as file $file");
+
+   sendHeaders($file, $size);
+   echo $data;
+   exit;
+}
+
+/**
+ * Sends the appropriate headers to the client for data download
+ *
+ * @param string $file File name to use
+ * @param string $size Size of the data for content-length
+ */
+function sendHeaders($file, $size)
+{
+   header("Connection: keep-alive", true);
+   header('Content-Type: application/octet-stream', true);
+   header("Content-Length: $size", true);
+   header("Content-Disposition: attachment; filename=\"$file\"", true);
+   ob_clean();
+   flush();
 }
 
 /**

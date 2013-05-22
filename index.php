@@ -4,25 +4,34 @@
  */
 
 define('PHOP', .008);
-require_once 'logic/PHOP.php';
-require_once 'logic/Debug.php';
-require_once 'logic/LocalStorage.php';
-require_once 'logic/Routes.php';
-require_once 'logic/Views.php';
+require_once 'phop/PHOP.php';
+require_once 'phop/Debug.php';
+require_once 'phop/LocalStorage.php';
+require_once 'phop/RemoteStorage.php';
+require_once 'phop/Routes.php';
+require_once 'phop/Views.php';
 
 function main()
 {
+   debug('', "\n\n");
    debug('PHOP', PHOP);
+   $action = getOrBlank($_GET, 'action');
+   $query  = getOrBlank($_GET, 'q');
 
-   // Routes: Default and asset requests
-   if ( !isset($_GET['action']) )
+   switch ($action)
    {
-      if ( !isset($_GET['q']) || empty($_GET['q']) )
-         routeDefault();
-      else
-         routeRequest();
-   }
+      default:
+      case '':
+         if ( empty($query) )
+            routeDefault();
+         else
+            routeRequest($query);
+         break;
 
+      case Actions::Index:
+         routeIndex($query);
+         break;
+   }
 }
 
 /**
@@ -35,100 +44,62 @@ function routeDefault()
 
 /**
  * Routes incoming client to an asset request
+ *
+ * @param string $query Query string to work on
  */
-function routeRequest()
+function routeRequest($query)
 {
-   $query = trim($_GET['q']);
+   $query = trim($query);
 
    // Break down request into parts
    $match = preg_match(Regexes::AssetRequest, $query, $matches);
-   $dir   = matchOrBlank($matches, 'dir');
-   $file  = matchOrBlank($matches, 'file');
+   $dir   = getOrBlank($matches, 'dir');
+   $file  = getOrBlank($matches, 'file');
 
-   debug('Incoming', "Query: $query, Dir: $dir, File: $file");
+   debug('Requests', "Query: $query, Dir: $dir, File: $file...");
 
+   // Reject invalid requests
    if ( $match === 0 || $match === false )
+   {
+      debug('Requests', 'Bad request; rejecting with 500' );
       gotoError(500, Errors::BadRequest);
+   }
 
    // Reject invalid directories
    if ( !isDirectory($dir) )
+   {
+      debug('Requests', 'Bad directory request; rejecting with 500' );
       gotoError(500, Errors::BadDirectory);
-
-   // Redirect directory requests
-   if ( empty($file) )
-      gotoUrl("phop.indexer.php?q=$dir");
-
-   // If plugin token found, redirect to plugins
-   if (strpos($file, ':') !== false)
-      getPlugin($dir, $file);
-
-   // Check for cached file
-   if (CACHING && isLocalFile($dir, $file))
-      gotoFile($dir, $file);
-
-   // No success? Fetch remotely and cache...
-   $fileData;
-   if (getRemoteFile($Q, $fileData) === true)
-   {
-      cacheFile($dir, $file, $fileData);
-      gotoFile($dir, $file);
-   }
-   else
-      fail("Not found", 404);
-
-}
-
-/*
- * FETCH FUNCTIONS
- */
-
-function getPlugin($dir, $file)
-{
-   $parts  = explode(":", $file, 2);
-   $plugin = $parts[0];
-   $data   = $parts[1];
-
-   debug('Plugin', "Requested: $plugin, Data: $data");
-   switch ($plugin) {
-      case "i":
-         return gotoUrl("http://imgur.com/$data");
-      case "p":
-         $data = str_replace('.zip','',$data);
-         return gotoUrl("phop.prim.php?q=$data");
    }
 
-   fail("Invalid plugin specified: $plugin", 400);
-}
-
-function getRemoteFile($req, &$fileData) {
-   global $RemotePaths;
-
-   foreach ($RemotePaths as $path)
+   // Check for cached or locally available file
+   if ( isLocalFile($dir, $file) )
    {
-      debug('Remote', "Fetching $path$req");
-      $c = curl_init($path . $req);
-      curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+      debug('Requests', 'Request is in local storage; sending to client' );
+      gotoFile($dir, $file);
+   }
 
-      $fileData = curl_exec($c);
-      $code     = curl_getinfo($c, CURLINFO_HTTP_CODE);
-      $errNo    = curl_errno($c);
-      $err      = curl_error($c);
-      curl_close($c);
+   // Check for remotely available file
+   if ( getRemoteFile($dir, $file, $data, $size) )
+   {
+      debug('Requests', 'Request was available remotely; sending to client' );
 
-      if ($errNo != 0) {
-         debug('Remote', "Curl error retriving $path$req : $err (code $errNo)");
-         continue;
-      } else if ($code == 404 || $code == 403) {
-         debug('Remote', "HTTP error retriving $path$req : $code");
-         continue;
+      if (Config::Caching)
+      {
+         cacheFile($dir, $file, $data);
+         gotoFile($dir, $file);
       }
-
-      if ($fileData !== false)
-         return true;
+      else
+         gotoData($file, $data, $size);
    }
 
-   debug('Remote', "No remote sources had $req");
-   return false;
+   // TODO: plugins
+   // TODO: 404
+}
+
+function routeIndex($query)
+{
+
 }
 
 main();

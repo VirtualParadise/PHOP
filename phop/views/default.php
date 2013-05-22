@@ -2,15 +2,15 @@
 /**
  * PHOP - Default page
  */
-require_once 'logic/PHOP.php';
-require_once 'logic/LocalStorage.php';
+require_once 'phop/PHOP.php';
+require_once 'phop/LocalStorage.php';
 
 if ( !defined('PHOP') )
    exit;
 
 $Data['models']   = getDirectoryCount('models');
 $Data['textures'] = getDirectoryCount('textures');
-$Data['url']      = PUBLIC_URL.'?q=';
+$Data['url']      = Config::PublicUrl.'?q=';
 ?>
 
 <div class="container">

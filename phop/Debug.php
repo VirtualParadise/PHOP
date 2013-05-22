@@ -11,6 +11,7 @@ if ( !defined('PHOP') )
  */
 function debug($tag, $msg)
 {
+   $tag = str_pad($tag, 10);
    error_log("[$tag] $msg");
 
    if (Config::Logging)

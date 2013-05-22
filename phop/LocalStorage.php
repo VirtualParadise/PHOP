@@ -16,7 +16,7 @@ if ( !defined('PHOP') )
 function isLocalFile($dir, $file)
 {
    $path = pathJoin([$dir, $file]);
-   return realpath($path) !== false;
+   return is_file($path);
 }
 
 /**

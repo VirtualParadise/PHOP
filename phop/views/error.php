@@ -2,7 +2,7 @@
 /**
  * PHOP - Error page
  */
-require_once 'logic/PHOP.php';
+require_once 'phop/PHOP.php';
 
 if ( !defined('PHOP') )
    exit;

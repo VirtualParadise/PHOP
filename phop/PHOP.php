@@ -10,22 +10,25 @@ error_reporting(E_ALL);
 class Config
 {
    const Caching = true;
-   const Logging = true;
+   const Logging = false;
    const LogFile = 'log.txt';
 
    const PublicUrl = 'http://localhost:8888/';
 
    static $RemotePaths = [
-      "http://awcommunity.org/romperroom/",
-      "http://aw.platform3d.com/multipath/"
+      "http://awcommunity.org/romperroom",
+      "http://aw.platform3d.com/multipath"
    ];
 
    static $AssetDirectories = [
       "models",
       "textures",
    ];
-}
 
+   static $Plugins = [
+      "prim"
+   ];
+}
 
 /**
  * Enumerations
@@ -36,10 +39,17 @@ class Config
  */
 class Directories
 {
-   const Templates = 'templates';
-   const Prims     = 'prims';
-   const Views     = 'views';
-   const Stats     = 'stats';
+   const PHOP    = 'phop';
+   const Views   = 'phop/views';
+   const Plugins = 'phop/plugins';
+}
+
+/**
+ * Enumeration of actions PHOP can handle
+ */
+class Actions
+{
+   const Index = 'index';
 }
 
 /**
@@ -59,7 +69,8 @@ class Errors
  */
 class Regexes
 {
-   const AssetRequest = '{^/?(?<dir>[a-z]+)(/(?<file>.+))?$}i';
+   const AssetRequest = '{^/?(?<dir>[a-z]+)/(?<file>.+\.[a-z]+)$}i';
+   const DirRequest   = '{^/?(?<dir>[a-z]+)\b}i';
 }
 
 /*
@@ -80,30 +91,30 @@ function pickNum($a, $b)
 /**
  * Joins a given array of strings into a relative path
  *
- * @param  array   $entries Parts of a path, including files and folders
- * @return string  Sanitized relative path
+ * @param  array  $entries Parts of a path, including files and folders
+ * @return string Sanitized relative path
  */
 function pathJoin(array $entries)
 {
    foreach ($entries as &$entry)
-      $entry = preg_replace('(\\\\|/)', '', $entry);
+      $entry = trim($entry, '/\\' );
 
    return implode('/', $entries);
 }
 
 /**
- * Helper function for .NET style of regex match arrays
+ * Helper function that returns blank strings rather than generate errors, if accessing
+ * a non-existent key in a given array
  *
- * @param  array  $matches Regex matches
+ * @param  array  $matches Array
  * @param  string $key     Key to fetch in the array
  * @return string A string of the given key in the matches, else blank string
  */
-function matchOrBlank(array $matches, $key)
+function getOrBlank(array $matches, $key)
 {
    if ( !isset($matches[$key]) )
       return '';
    else
       return $matches[$key];
 }
-
 ?>
