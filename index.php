@@ -1,9 +1,12 @@
 <?php
 /**
- * PHOP - Main routing script
+ * PHOP - Main application and routing script
  */
+
+define('PHOP', .008);
 require_once 'logic/PHOP.php';
 require_once 'logic/Debug.php';
+require_once 'logic/LocalStorage.php';
 require_once 'logic/Routes.php';
 require_once 'logic/Views.php';
 
@@ -11,24 +14,45 @@ function main()
 {
    debug('PHOP', PHOP);
 
-   if ( !isset($_GET['q']) )
-      gotoView(Views::Main);
+   // Routes: Default and asset requests
+   if ( !isset($_GET['action']) )
+   {
+      if ( !isset($_GET['q']) || empty($_GET['q']) )
+         routeDefault();
+      else
+         routeRequest();
+   }
 
+}
+
+/**
+ * Routes incoming client to the default page
+ */
+function routeDefault()
+{
+   gotoView(Views::Main);
+}
+
+/**
+ * Routes incoming client to an asset request
+ */
+function routeRequest()
+{
    $query = trim($_GET['q']);
 
    // Break down request into parts
-   preg_match(Regexes::AssetRequest, $query, $parts);
-   $dir  = $parts['dir'];
-   $file = $parts['file'];
+   $match = preg_match(Regexes::AssetRequest, $query, $matches);
+   $dir   = matchOrBlank($matches, 'dir');
+   $file  = matchOrBlank($matches, 'file');
 
    debug('Incoming', "Query: $query, Dir: $dir, File: $file");
 
-   if ( empty($dir) )
-      gotoView(Views::Main);
+   if ( $match === 0 || $match === false )
+      gotoError(500, Errors::BadRequest);
 
    // Reject invalid directories
-   if ( !is_dir($dir) )
-      fail("Invalid directory", 400);
+   if ( !isDirectory($dir) )
+      gotoError(500, Errors::BadDirectory);
 
    // Redirect directory requests
    if ( empty($file) )
@@ -51,6 +75,7 @@ function main()
    }
    else
       fail("Not found", 404);
+
 }
 
 /*

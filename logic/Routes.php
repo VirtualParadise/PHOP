@@ -7,6 +7,21 @@ if ( !defined('PHOP') )
    exit;
 
 /**
+ * Determines if incoming client is VR software. Currently only detects Virtual Paradise
+ *
+ * @return bool true if VR client, else false (e.g. if browser)
+ */
+function isVRClient()
+{
+   $ua = $_SERVER['HTTP_USER_AGENT'];
+
+   if ( strpos($ua, 'VirtualParadise') !== false )
+      return true;
+   else
+      return false;
+}
+
+/**
  * Feeds a file to the requesting client
  *
  * @param  string $dir  Target directory
@@ -60,13 +75,32 @@ function gotoView($view, array $data = [])
    exit;
 }
 
-function fail($msg, $code)
+/**
+ * Redirects incoming client to an error. If client is a VR, just sends a HTTP error code,
+ * else displays an error view.
+ *
+ * @param int    $code  HTTP code to use
+ * @param string $type  Type of error; use Errors enumeration
+ * @param array  $extra Extra data to provide the view
+ */
+function gotoError($code, $type, $extra = [])
 {
-   debug('Response', "Failing with $code, $msg");
-   header("Status: $msg", true, $code);
+   debug('Response', "Failing with $code, type: $type");
+   header("Status: $type", true, $code);
 
-   if ($print) echo "Error $code: $msg";
-   exit(1);
+   if ( isVRClient() )
+      exit;
+
+   $data = [
+      'code'  => $code,
+      'type'  => $type,
+      'extra' => $extra,
+   ];
+
+   $view = new View(Views::Error);
+   $view->Title = "Error: $type - PHOP";
+   $view->Generate($data);
+   exit;
 }
 
 ?>

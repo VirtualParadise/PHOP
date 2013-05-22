@@ -20,6 +20,22 @@ function isLocalFile($dir, $file)
 }
 
 /**
+ * Checks if a given directory name is allowed and exists
+ *
+ * @param  $dir string Target directory to check
+ * @return bool True if acceptable, false if not or non-existent
+ */
+function isDirectory($dir)
+{
+   if      ( !in_array($dir, Config::$AssetDirectories, true) )
+      return false;
+   else if ( !is_dir($dir) )
+      return false;
+   else
+      return true;
+}
+
+/**
  * Counts number of entries in a given directory
  *
  * @param  string  $dir Target directory to check
