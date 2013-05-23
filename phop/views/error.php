@@ -18,6 +18,17 @@ if ( !defined('PHOP') )
    switch ($Data['type'])
    {
       /**
+       * Unhandled pages (e.g. plugins)
+       */
+      default:
+         ?>
+            <p>
+               <?php echo getOrBlank($Data['extra'], 'desc'); ?>
+            </p>
+         <?php
+         break;
+
+      /**
        * General bad request error
        */
       case Errors::BadRequest:

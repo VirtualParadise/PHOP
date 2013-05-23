@@ -8,12 +8,28 @@ if ( !defined('PHOP') )
 
 abstract class Plugin
 {
+   /**
+    * @var Plugin[] All plugins loaded by PHOP
+    */
    static $Loaded = [];
 
+   /**
+    * Gets the plugin's full name
+    *
+    * @return string Plugin name
+    */
    abstract function getName();
+
+   /**
+    * Asks the plugin to handle an asset request
+    *
+    * @param  string $dir  Target directory to handle
+    * @param  string $file Target file to handle
+    * @return bool   Return true if handled, else false
+    */
    abstract function handleRequest($dir, $file);
 
-   function __construct()
+   final function __construct()
    {
       if (Plugin::$Loaded === false)
          Plugin::$Loaded = [];
@@ -22,21 +38,6 @@ abstract class Plugin
       debug('Plugins', "Adding '$name' to loaded plugins");
       array_push(Plugin::$Loaded, $this);
    }
-}
-
-/**
- * Returns all plugins that handle the given directory and file request
- *
- * @param  string $dir  Requested directory name to handle
- * @param  string $file Requested file name to handle
- * @return array  Array of Plugin-class objects that handle the given request
- */
-function checkPlugins($dir, $file)
-{
-   loadPlugins();
-
-   foreach (Plugin::$Loaded as $plugin)
-      $plugin->handleRequest($dir, $file);
 }
 
 function loadPlugins()
@@ -57,5 +58,3 @@ function loadPlugins()
          include_once $path;
    }
 }
-
-?>

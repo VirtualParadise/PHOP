@@ -86,17 +86,6 @@ define('KeyQuery',  'q');
  * Utility functions
  */
 
-function pick($a, $b) { return empty($a) ? $b : $a; }
-function pickNum($a, $b)
-{
-   if      ( empty($a) )
-      return $b;
-   else if ( !is_numeric($a) )
-      return fail("Parameter not a number", 400);
-   else
-      return $a;
-}
-
 /**
  * Joins a given array of strings into a relative path
  *
@@ -123,6 +112,22 @@ function getOrBlank(array $matches, $key)
 {
    if ( !isset($matches[$key]) )
       return '';
+   else
+      return $matches[$key];
+}
+
+/**
+ * Helper function that returns false rather than generate errors, if accessing
+ * a non-existent key in a given array
+ *
+ * @param  array  $matches Array
+ * @param  string $key     Key to fetch in the array
+ * @return string A string of the given key in the matches, else false
+ */
+function getOrFalse(array $matches, $key)
+{
+   if ( !isset($matches[$key]) )
+      return false;
    else
       return $matches[$key];
 }

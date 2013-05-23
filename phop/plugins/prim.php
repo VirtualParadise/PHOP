@@ -9,18 +9,17 @@ if ( !defined('PHOP') )
 
 class PluginPrim extends Plugin
 {
-   static $Config = [
-      'MinValue' => 0.001,
-      'MaxValue' => 32.0,
-   ];
-
-   const RegexPrim       = '{^(p:)?(?<type>[a-z]+)(?<params>.+?)$}i';
-   const RegexFlatParams = '{(?<x>[0-9]+\.?[0-9]*)(x(?<y>[0-9]+\.?[0-9]*))?(?<p>p)?}i';
+   const RegexPrim       = '{^(p:)?(?<filename>(?<name>(?<type>[a-z]+)(?<params>.+?))\.zip)$}i';
+   const RegexFlatParams = '{^(?<x>[0-9]+\.?[0-9]*)(x(?<y>[0-9]+\.?[0-9]*))?(?<p>p)?$}i';
+   const Cache           = 'prims';
+   const Templates       = 'phop/primTemplates';
 
    // Geometry consts
-   const MMX  = 1000.0;
-   const MMY  = 1000.0;
-   const MMUV = 100.0;
+   const MMX      = 1000.0;
+   const MMY      = 1000.0;
+   const MMUV     = 100.0;
+   const MinValue = 0.001;
+   const MaxValue = 32.0;
 
    // Flat types
    const FlatWall     = 'wall';
@@ -36,113 +35,142 @@ class PluginPrim extends Plugin
       return "Prim generator";
    }
 
-   function main()
+   function handleRequest($dir, $file)
    {
-      $Q = $_GET['q'];
-      $fileName = $Q.".zip";
+      debug('Prims', "Checking if I handle $dir/$file");
+
+      // Only handle models request
+      if ($dir !== 'models')
+         return false;
+
+      // Validate requests
+      if ( !preg_match(PluginPrim::RegexPrim, $file, $matches) )
+         return false;
+      else
+         debug('Prims', "Handling request for $file ($matches[filename])");
+
+      $file = $matches['filename'];
+      $path = pathJoin([PluginPrim::Cache, $file]);
 
       // First, check for local file...
-      if (getLocalPrim($fileName) === true)
-         return gotoFile(PRIMS, $fileName);
+      if ( is_file($path) )
+         gotoFile(PluginPrim::Cache, $file);
 
-      // Verify valid request
-      $matches;
-      if (!preg_match(RGX_PRIMNAME,$Q,$matches))
-         return fail("Invalid primitive syntax", 400);
-
-      $type = $matches['type'];
+      $type   = $matches['type'];
       $params = explode(',', $matches['params']);
-      $prim;
       debug('Prim', "Trying to generate a $type with $matches[params]");
-      switch ($type) {
+
+      switch ($type)
+      {
          case 'w':
          case 'wll':
          case 'wall':
-            $prim = primFlat($params, TYPE_WALL);
+            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatWall);
             break;
 
          case 'p':
          case 'pan':
          case 'panel':
-            $prim = primFlat($params, TYPE_PANEL);
+            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatPanel);
             break;
 
          case 'f':
          case 'flr':
          case 'floor':
-            $prim = primFlat($params, TYPE_FLOOR);
+            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatWall);
             break;
 
          case 'flt':
          case 'flat':
-            $prim = primFlat($params, TYPE_FLAT);
+            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatFlat);
             break;
 
          case 'fac':
          case 'facer':
-            $prim = primFlat($params, TYPE_FACER);
+            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatFacer);
             break;
 
          case 'tri':
          case 'triangle':
-            $prim = primFlat($params, TYPE_TRIANGLE);
+            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatTriangle);
             break;
 
          case 'triflr':
          case 'trifloor':
-            $prim = primFlat($params, TYPE_TRIFLOOR);
+            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatTrifloor);
             break;
 
          default:
-            return fail("Unknown primitive type: $type", 400);
+            gotoError(400, 'Unknown prim type', [
+               "The specified prim type <code>$type</code> is not supported
+               by the prim generator."
+            ]);
       }
 
       if ( empty($prim) )
-         return fail("Unknown error", 500);
+         gotoError(400, 'Unknown prim generator error');
+
+      debug('Prim', "Saving prim '$file'");
+
+      if ( !is_dir(PluginPrim::Cache) )
+         mkdir(PluginPrim::Cache);
 
       $zip = new ZipArchive();
-      $zip->open(PRIMS.$fileName, ZIPARCHIVE::CREATE);
-      $zip->addFromString("$Q.rwx", $prim);
+      $zip->open($path, ZIPARCHIVE::CREATE);
+      $zip->addFromString("$matches[name].rwx", $prim);
       $zip->close();
-
-      gotoFile(PRIMS, $Q.".zip");
+      gotoFile(PluginPrim::Cache, $file);
    }
 
-   function primFlat($values, $type) {
-      $dim;
-      if (!preg_match(RGX_PRIMFLAT, $values[0], $dim))
-         return fail("Invalid Flat primitive syntax", 400);
+   static function makeFlat($values, $type)
+   {
+      if ( !preg_match(PluginPrim::RegexFlatParams, $values[0], $dim) )
+         gotoError(400, 'Invalid prim syntax');
 
       // Dimension checking (reads values as mm)
-      $rawX = (float)$dim[x];
-      $rawY = (float)pickNum($dim[y], $rawX);
+      $rawX = (float) $dim['x'];
+      $rawY = isset($dim['y']) && !empty($dim['y'])
+         ? (float) $dim['y']
+         : $dim['x'];
+      debug('Flat prim', "Raw X $rawX by Raw Y $rawY");
 
       $dimXFactor = 2;
-      $dimYFactor = ($type === TYPE_FLAT || $type === TYPE_FLOOR || $type === TYPE_TRIFLOOR)
+      $dimYFactor = ($type === PluginPrim::FlatFlat || $type === PluginPrim::FlatFloor || $type === PluginPrim::FlatTrifloor)
          ? 2
          : 1;
 
-      $dimX = $rawX / (MM_X*$dimXFactor);
-      $dimY = $rawY / (MM_Y*$dimYFactor);
+      $dimX = $rawX / (PluginPrim::MMX * $dimXFactor);
+      $dimY = $rawY / (PluginPrim::MMY * $dimYFactor);
+      debug('Flat prim', "X $dimX by Y $dimY");
 
-      if ($dimX < MIN_VALUE || $dimY < MIN_VALUE)
-         return fail("Flat primitive too small", 400);
+      if ($dimX < PluginPrim::MinValue || $dimY < PluginPrim::MinValue)
+         gotoError(400, 'Flat primitive is too small');
 
-      if ($dimX > MAX_VALUE || $dimY > MAX_VALUE)
-         return fail("Flat primitive too large", 400);
+      if ($dimX > PluginPrim::MaxValue || $dimY > PluginPrim::MaxValue)
+         gotoError(400, 'Flat primitive is too large');
 
-      // Optional parameters (tag + UV planar scaling)
-      $phantom = empty($dim['p']) ? 'on' : 'off';
-      $tag = parseTagNumber(pick($values[1], 200));
-      $uv = ($type === TYPE_FLAT || $type === TYPE_PANEL || $type === TYPE_FACER)
-         ? uvFill($values[2], $values[3])
-         : uvPlanar($values[2], $values[3], $rawX, $rawY);
+      // Phantom parameter
+      $phantom = isset($dim['p']) && !empty($dim['p'])
+         ? 'off'
+         : 'on';
+
+      // Tags
+      $tag = isset($values[1]) && !empty($values[1])
+         ? PluginPrim::parseTagNumber( $values[1] )
+         : 200;
+
+      // UV coordinates
+      $uvX = isset($values[2]) ? $values[2] : false;
+      $uvY = isset($values[3]) ? $values[3] : false;
+      $uv  = ($type === PluginPrim::FlatFlat || $type === PluginPrim::FlatPanel || $type === PluginPrim::FlatFacer)
+         ? PluginPrim::uvFill($uvX, $uvY)
+         : PluginPrim::uvPlanar($uvX, $uvY, $rawX, $rawY);
 
       // Generate using template
       debug('Flat', "Type: $type");
-      debug('Flat', "Dimensions: $dimX by $dimY, tag: $tag, uvX scale: $uvX, uvY scale: $uvY, collision: $phantom");
-      $template = getPrimTemplate($type);
-      $prim = sprintf($template, $dimX, $dimY, $tag, $uv[0], $uv[1], $phantom);
+      debug('Flat', "Dimensions: $dimX by $dimY, tag: $tag, uvX scale: $uv[0], uvY scale: $uv[1], collision: $phantom");
+      $template = PluginPrim::getPrimTemplate($type);
+      $prim     = sprintf($template, $dimX, $dimY, $tag, $uv[0], $uv[1], $phantom);
 
       debug('Flat', "Generated: $prim");
       return $prim;
@@ -152,41 +180,52 @@ class PluginPrim extends Plugin
     * MATH / RWX
     */
 
-   function uvFill($x, $y) {
-      if ( empty($x) ) {
+   static function uvFill($x, $y)
+   {
+      if ( empty($x) )
+      {
          $uvX = 1;
          $uvY = 1;
-      } else if ( is_numeric($x) && empty($y) ) {
-         $uvX = (float)$x;
-         $uvY = (float)$x;
-      } else if ( is_numeric($y) ) {
-         $uvX = (float)$x;
-         $uvY = (float)$y;
-      } else {
-         return fail("Invalid UV parameters", 400);
       }
+      else if ( is_numeric($x) && empty($y) )
+      {
+         $uvX = (float) $x;
+         $uvY = (float) $x;
+      }
+      else if ( is_numeric($y) )
+      {
+         $uvX = (float) $x;
+         $uvY = (float) $y;
+      } else
+         gotoError(400, 'Invalid UV parameters');
 
-      return Array($uvX, $uvY);
+      return [$uvX, $uvY];
    }
 
-   function uvPlanar($x, $y, $rawX, $rawY) {
-      if ( empty($x) ) {
-         $uvX = $rawX / (MM_UV / 1);
-         $uvY = $rawY / (MM_UV / 1);
-      } else if ( is_numeric($x) && empty($y) ) {
-         $uvX = $rawX / (MM_UV / (float)$x);
-         $uvY = $rawY / (MM_UV / (float)$x);
-      } else if ( is_numeric($y) ) {
-         $uvX = $rawX / (MM_UV / (float)$x);
-         $uvY = $rawY / (MM_UV / (float)$y);
-      } else {
-         return fail("Invalid UV parameters", 400);
+   static function uvPlanar($x, $y, $rawX, $rawY)
+   {
+      if ( empty($x) )
+      {
+         $uvX = $rawX / (PluginPrim::MMUV / 1);
+         $uvY = $rawY / (PluginPrim::MMUV / 1);
       }
+      else if ( is_numeric($x) && empty($y) )
+      {
+         $uvX = $rawX / (PluginPrim::MMUV / (float)$x);
+         $uvY = $rawY / (PluginPrim::MMUV / (float)$x);
+      }
+      else if ( is_numeric($y) )
+      {
+         $uvX = $rawX / (PluginPrim::MMUV / (float)$x);
+         $uvY = $rawY / (PluginPrim::MMUV / (float)$y);
+      } else
+         gotoError(400, 'Invalid UV parameters');
 
-      return Array($uvX, $uvY);
+      return [$uvX, $uvY];
    }
 
-   function parseTagNumber($val) {
+   static function parseTagNumber($val)
+   {
       switch($val)
       {
          case 'p':
@@ -194,8 +233,8 @@ class PluginPrim extends Plugin
          case 's':
             return 100;
          default:
-            if (!is_numeric($val))
-               return fail("Invalid tag parameter", 400);
+            if ( !is_numeric($val) )
+               gotoError(400, 'Invalid tag parameter');
             else
                return $val;
       }
@@ -205,24 +244,11 @@ class PluginPrim extends Plugin
     * FILES
     */
 
-   function getPrimTemplate($template) {
-      return file_get_contents(TEMPLATES.$template.'.txt');
-   }
-
-   /**
-    * Alias to getLocalFile, for the PRIMS folder
-    */
-   function getLocalPrim($name) {
-      $prim = getLocalFile(PRIMS,$name);
-
-      if ($prim === false)
-         return false;
-      else if (filemtime(__FILE__) > filemtime($prim))
-         return false;
-      else
-         return true;
+   static function getPrimTemplate($template)
+   {
+      $path = pathJoin([PluginPrim::Templates, $template.'.txt']);
+      return file_get_contents($path);
    }
 }
 
 new PluginPrim();
-?>
