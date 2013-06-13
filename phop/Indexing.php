@@ -22,6 +22,11 @@ class IndexEntry
    public $Modified;
 
    /**
+    * @var int File size in bytes
+    */
+   public $Size;
+
+   /**
     * @var mixed String array of zip contents, false if not a zip or integer if error
     */
    public $ZipContents = false;
@@ -77,11 +82,11 @@ function gotoIndex($dir)
 function generateEntry($dir, $file)
 {
    $rawPath  = pathJoin([$dir, $file]);
-   $modified = filemtime($rawPath);
    $entry    = new IndexEntry();
 
-   $entry->Name        = $file;
-   $entry->Modified    = $modified;
+   $entry->Name     = $file;
+   $entry->Modified = filemtime($rawPath);
+   $entry->Size     = filesize($rawPath);
 
    if ( strripos($file, '.zip', -4) !== false )
       $entry->ZipContents = getZipContents($rawPath);

@@ -25,6 +25,9 @@ function printEntries($dir, array $data)
       echo "<a href='$dir/$name'>$name</a>";
       echo " - Last modified: $modified\n";
 
+      if ( $entry->Size <= 20 )
+         echo "<span class='text-warning'> &#8627; <strong>Warning:</strong> This file is less than 20 bytes; may be broken/invalid</span>\n";
+
       if ( is_int($contents) )
       {
          $error = getZipError($contents);

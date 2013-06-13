@@ -3,6 +3,13 @@
     Header set Connection keep-alive
 </ifModule>
 
+# Debugging
+#php_flag display_startup_errors on
+#php_flag display_errors on
+#php_flag html_errors on
+#php_flag log_errors on
+#php_value error_log  /var/www/html/blizzard/op/error_log
+
 RewriteEngine on
 
 # Adjust to the public URL relative path of OP

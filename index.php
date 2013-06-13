@@ -84,6 +84,16 @@ function routeRequest($query)
       gotoFile($dir, $file);
    }
 
+   // Check for plugins which handle request
+   loadPlugins();
+   foreach (Plugin::$Loaded as $plugin)
+      if ( $plugin->handleRequest($dir, $file) )
+      {
+         $pluginName = $plugin->getName();
+         debug('Requests', "Plugin '$pluginName' was able to handle the request; exiting" );
+         exit;
+      }
+
    // Check for remotely available file
    if ( getRemoteFile($dir, $file, $data, $size) )
    {
@@ -97,16 +107,6 @@ function routeRequest($query)
       else
          gotoData($file, $data, $size);
    }
-
-   // Check for plugins which handle request
-   loadPlugins();
-   foreach (Plugin::$Loaded as $plugin)
-      if ( $plugin->handleRequest($dir, $file) )
-      {
-         $pluginName = $plugin->getName();
-         debug('Requests', "Plugin '$pluginName' was able to handle the request; exiting" );
-         exit;
-      }
 
    // Finally, fail with 404
    gotoError(404, Errors::NotFound);

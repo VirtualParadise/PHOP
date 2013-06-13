@@ -24,6 +24,7 @@ class Config
    static $AssetDirectories = [
       "models",
       "textures",
+      "avatars",
    ];
 
    static $Plugins = [

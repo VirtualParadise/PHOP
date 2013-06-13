@@ -77,7 +77,7 @@ class PluginPrim extends Plugin
          case 'f':
          case 'flr':
          case 'floor':
-            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatWall);
+            $prim = PluginPrim::makeFlat($params, PluginPrim::FlatFloor);
             break;
 
          case 'flt':
@@ -101,10 +101,7 @@ class PluginPrim extends Plugin
             break;
 
          default:
-            gotoError(400, 'Unknown prim type', [
-               "The specified prim type <code>$type</code> is not supported
-               by the prim generator."
-            ]);
+            return false;
       }
 
       if ( empty($prim) )
