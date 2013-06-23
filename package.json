@@ -1,0 +1,16 @@
+{
+    "name"        : "VWAS",
+    "description" : "Virtual World Asset Server",
+    "author"      : "Roy Curtis <roy.adrian.curtis@gmail.com>",
+    "version"     : "0.0.1",
+    "private"     : true,
+
+    "scripts" : {
+        "start" : "node VWAS.js"
+    },
+
+    "dependencies" : {
+        "express" : "3.x",
+        "winston" : "0.x"
+    }
+}

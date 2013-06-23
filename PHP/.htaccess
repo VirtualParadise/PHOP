@@ -14,7 +14,7 @@ RewriteEngine on
 
 # Adjust to the public URL relative path of OP
 # e.g. http://op.com/for/world/?q= -> /for/world/
-RewriteBase /
+RewriteBase /blizzard/op/
 
 # Redirect legacy indexer requests
 RewriteRule ^phop\.indexer\.php ?action=index [NC,R=301,L]

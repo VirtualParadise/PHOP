@@ -3,7 +3,7 @@
  * PHOP - Common functions and data
  */
 error_reporting(E_ALL);
-date_default_timezone_set('UTC');
+date_default_timezone_set('America/Los_Angeles');
 
 /**
  * PHOP's configuration, kept in a container object
@@ -14,7 +14,7 @@ class Config
    const Logging = false;
    const LogFile = 'log.txt';
 
-   const PublicUrl = 'http://localhost:8888';
+   const PublicUrl = 'http://s1.uniquevps.info/blizzard/op';
 
    static $RemotePaths = [
       "http://awcommunity.org/romperroom",

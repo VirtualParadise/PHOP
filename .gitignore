@@ -6,3 +6,5 @@ test.html
 *.db
 .idea/*
 css/phop.css
+node_modules/
+VWAS/Static/CSS/*.css
