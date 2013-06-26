@@ -2,26 +2,18 @@
  * VWAS : Configuration file for this instance of VWAS
  */
 
-var Log = require('winston');
+var Log = require("./VWAS/Logging");
 
 /**
  * Core configuration object for all of VWAS
- * @type {object}
  */
-var VWASConfig = {
+var Config = {
     /**
      * Logging
      */
     Log : {
-        Enabled   : true,
-        // Minimum log level
-        Level     : Log.config.syslog.levels.debug,
-        // Should logging be written to disk?
-        ToDisk    : true,
-        // Path to log file to write/append
-        DiskPath  : "vwas.log",
-        // Should logging be written to console?
-        ToConsole : true,
+        // Bitwise flags of enabled logging levels
+        Level : Log.Levels.All,
     },
 
     /**
@@ -31,6 +23,8 @@ var VWASConfig = {
         // If asset serving (e.g. http://server.com/models/model.zip) is enabled.
         // Should always be enabled, except for emergencies or servicing
         Enabled     : true,
+        Host        : "0.0.0.0",
+        Port        : 8080,
         // Global list of directories the server will serve from
         Directories : ['models', 'textures', 'avatars'],
     },
@@ -73,3 +67,5 @@ var VWASConfig = {
         Path    : "Storage/Upload",
     }
 };
+
+module.exports = Config;
