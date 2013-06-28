@@ -8,30 +8,7 @@ date_default_timezone_set('UTC');
 /**
  * PHOP's configuration, kept in a container object
  */
-class Config
-{
-   const Caching = true;
-   const Logging = false;
-   const LogFile = 'log.txt';
 
-   const PublicUrl = 'http://localhost:8888';
-
-   static $RemotePaths = [
-      "http://awcommunity.org/romperroom",
-      "http://aw.platform3d.com/multipath"
-   ];
-
-   static $AssetDirectories = [
-      "models",
-      "textures",
-      "avatars",
-   ];
-
-   static $Plugins = [
-      "prim",
-      //"example",
-   ];
-}
 
 /**
  * Enumerations
