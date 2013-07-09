@@ -3,9 +3,6 @@
  * PHOP - Views manager
  */
 
-if ( !defined('PHOP') )
-   exit;
-
 class Views
 {
    const Main  = 'default';

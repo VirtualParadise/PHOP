@@ -3,8 +3,6 @@
  * PHOP - Asset plugin architecture
  */
 
-if ( !defined('PHOP') )
-   exit;
 
 abstract class Plugin
 {

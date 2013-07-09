@@ -3,9 +3,6 @@
  * PHOP - Indexing manager
  */
 
-if ( !defined('PHOP') )
-   exit;
-
 /**
  * Represents an index entry for a file's metadata
  */

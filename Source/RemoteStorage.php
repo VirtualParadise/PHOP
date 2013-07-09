@@ -3,9 +3,6 @@
  * PHOP - Remote retrival and caching functions
  */
 
-if ( !defined('PHOP') )
-   exit;
-
 /**
  * Attempts a cURL fetch for the given directory and file from the configured remote
  * sources

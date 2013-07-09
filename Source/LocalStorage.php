@@ -3,8 +3,6 @@
  * PHOP - Local storage functions
  */
 
-if ( !defined('PHOP') )
-   exit;
 
 /**
  * Checks if file is available locally

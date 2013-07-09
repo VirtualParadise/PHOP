@@ -3,39 +3,42 @@
  * PHOP : Main application entry point
  */
 
+namespace PHOP;
+
 // Autoloader for Composer modules such as ReactPHP
 require 'vendor/autoload.php';
 
-// PHOP source layout
+use PHOP\Utility\Log;
+use React\EventLoop\Factory;
+use React\Socket\Server as SocketServer;
+use React\Http\Server as HttpServer;
+
+/**
+ * PHOP source layout
+ */
 require_once 'Source\PHOP.php';
+require_once 'Source\Indexing.php';
+require_once 'Source\LocalStorage.php';
+require_once 'Source\RemoteStorage.php';
+require_once 'Source\Routes.php';
+require_once 'Source\Views.php';
+require_once 'Source\Plugins.php';
 
-define('PHOP', .008);
+require_once 'Source\Utility\Errors.php';
+require_once 'Source\Utility\Logger.php';
 
-function main()
-{
-   debug('', "\n\n");
-   debug('PHOP', PHOP);
-   $action = getOrBlank($_GET, KeyAction);
-   $query  = getOrBlank($_GET, KeyQuery);
+require_once 'PHOP.Config.php';
 
-   switch ($action)
-   {
-      case '':
-         if ( empty($query) )
-            routeDefault();
-         else
-            routeRequest($query);
-         break;
+/**
+ * PHOP version constant
+ */
+define('PHOP', "1.0.0");
 
-      case Actions::Index:
-         routeIndex($query);
-         break;
+/**
+ * Main entry point of PHOP server
+ */
 
-      default:
-         gotoError(500, Errors::BadAction);
-         break;
-   }
-}
+
 
 /**
  * Routes incoming client to the default page
@@ -135,5 +138,5 @@ function routeIndex($query)
    gotoIndex($dir);
 }
 
-main();
+
 ?>

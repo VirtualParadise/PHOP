@@ -2,12 +2,7 @@
 /**
  * PHOP - Common functions and data
  */
-error_reporting(E_ALL);
 date_default_timezone_set('UTC');
-
-/**
- * PHOP's configuration, kept in a container object
- */
 
 
 /**

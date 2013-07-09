@@ -3,9 +3,6 @@
  * PHOP - Routing functions
  */
 
-if ( !defined('PHOP') )
-   exit;
-
 /**
  * Determines if incoming client is VR software. Currently only detects Virtual Paradise
  *
