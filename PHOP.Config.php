@@ -29,26 +29,38 @@ class Config
       'Directories' => ['models', 'textures', 'avatars'],
    ];
 
-   const Caching = true;
-   const Logging = false;
-   const LogFile = 'log.txt';
-
-   const PublicUrl = 'http://localhost:8888';
-
-   static $RemotePaths = [
-      "http://awcommunity.org/romperroom",
-      "http://aw.platform3d.com/multipath"
+   /**
+    * Local
+    */
+   public static $Local = [
+      'Enabled' => true,
+      'Sources' => [
+         'Storage/Local'
+      ],
    ];
 
-   static $AssetDirectories = [
-      "models",
-      "textures",
-      "avatars",
+   /**
+    * Remote
+    */
+   public static $Remote = [
+      'Enabled'   => true,
+      'Cache'     => true,
+      'CachePath' => 'Storage/Cache',
+      'Sources' => [
+         [
+             'Location' => 'http://objectpath.com',
+             // Directories : ['models', 'textures', 'avatars'],
+             // Cache       : true,
+         ],
+      ],
    ];
 
-   static $Plugins = [
-      "prim",
-      //"example",
+   /**
+    * Public uploads
+    */
+   public static $Upload = [
+      'Enabled' => true,
+      'Path'    => 'Storage/Upload'
    ];
 }
 ?>
