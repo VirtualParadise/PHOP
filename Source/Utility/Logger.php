@@ -1,6 +1,6 @@
 <?php
 /**
- * PHOP : Container class for logging functions and setup
+ * PHOP : Application-wide logging with various levels and tag support
  */
 namespace PHOP\Utility;
 
@@ -35,13 +35,36 @@ final class LogLevels
    const Fine     = 64;
    const Finer    = 128;
 
+   /**
+    * @var array[string]int
+    */
+   private static $levels;
+
+   /**
+    * Converts given level to string
+    * @param  int $level
+    * @return string
+    */
+   public static function ToString($level)
+   {
+      if (LogLevels::$levels === null)
+      {
+         $reflection        = new \ReflectionClass('PHOP\Utility\LogLevels');
+         LogLevels::$levels = $reflection->getConstants();
+      }
+
+      foreach (LogLevels::$levels as $name => $value)
+         if ($level === $value)
+            return $name;
+
+      return 'Unknown';
+   }
+
    private function __construct() { }
 }
 
 /**
  * Static class with logging functions for all of VWAS
- *
- * @package PHOP\Utility
  */
 class Log
 {
@@ -49,12 +72,7 @@ class Log
     * Bit-wise flag of the current logging levels in use
     * @var int
     */
-   public static $Level = LogLevels::All;
-
-   public static function Configure()
-   {
-      Log::$Level = Config::$Log['Level'];
-   }
+   public static $Level = LogLevels::Production;
 
    /**
     * Emits a log message to console if allowed by the currently set LogLevel
@@ -67,7 +85,8 @@ class Log
       if ( (Log::$Level & $level) === 0 )
          return;
 
-      echo "$level | [$tag] $message";
+      $levelName = LogLevels::ToString($level);
+      echo "$levelName | [$tag] $message\n";
    }
 
    public static function Critical($tag, $message) { Log::Emit(LogLevels::Critical, $tag, $message); }
