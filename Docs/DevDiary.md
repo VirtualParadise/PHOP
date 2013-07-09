@@ -1,9 +1,33 @@
 # Development diary
-This is a running commentary on the porting and development of VWAS. I write this in the
+This is a running commentary on the porting and development of PHOP/VWAS. I write this in the
 hopes that information and critiques added will be of use to other developers, both of
-JS applications and those building on VWAS.
+JS or PHP applications and those building on PHOP/VWAS.
 
-*These articles are written in no particular order*
+*These entries are written in no particular order*
+
+## Keeping focused on the milestone at hand
+My biggest priority on PHOP *should be* to get the core and already existing code to a
+PHP standalone architecture with React. So far, I have had to stop myself from doing
+following:
+
+* **Doing my own fork of React** - I am not happy with the lack of [docblocks]
+(https://github.com/igorw/evenement/pull/14#issuecomment-18460477) and I think there
+could be a more simple solution for PHP HTTP serving out there. But it is irrelevant to
+ the project at hand.
+
+* **Writing a full-blown config handler** - I want a system like Nini from C# and a web
+ interface for configuring PHOP, rather than just doing it by PHP file as is currently
+ the case. Such a big undertaking is best left to when the core porting is done.
+
+* **Starting work on PHOP 2** - I have big plans (see ToDo.md) for PHOP,
+but I keep rushing to start preliminary work on the code for such features,
+out of excitement. I risk tiring myself too fast of the project if I do so,
+by overwhelming myself with both porting and new feature design.
+
+* **Writing my own replacement framework for core PHP functionality** - It is perhaps
+no secret that [PHP's framework is of bad and/or outdaded design](http://me.veekun
+.com/blog/2012/04/09/php-a-fractal-of-bad-design/), which I would like to solve by
+writing a framework of aliases around PHP library functions and classes sometime.
 
 ## On confusing Javascript patterns
 I am finding difficult in node.js difficult due to strange patterns used in external
@@ -36,9 +60,11 @@ Some code examples and module use this strange line to export objects (for examp
    // some object
  }
  ```
+
 I find this to be a confusing and redundant pattern. Simply using "module.exports" should
 be sufficient. Furthermore, some modules assign a *constructor* to the export to generate
 an object (example from Express):
+
  ```javascript
  var express = require('express');
  var app = express();
@@ -47,6 +73,7 @@ an object (example from Express):
 I think this is a bad pattern. In the IDE, this prevents me from finding out what
 `express()` is supposed to return or what I can do with it, unless I use the (sometimes
 terse) documentation. Other modules abuse this constructor/factory pattern in other ways:
+
  ```javascript
  winston.add(winston.transports.File, { filename: 'somefile.log' });
  winston.remove(winston.transports.Console);
@@ -55,15 +82,15 @@ terse) documentation. Other modules abuse this constructor/factory pattern in ot
 This code makes it look like `winston.transports.*` are static instances, but this is not
 the case. They are factory functions and they are called by `.add` and `.remove`. It
 would make more sense if they were constructors for classes instead:
+
  ```javascript
  winston.add(new winston.transports.File({ filename: 'somefile.log' });
  ```
 
 ## Connect and Middleware
-Replaced `express.js` with `connect.js`. Express'
-documentation was too terse and its code was not suitably documented for use with an IDE.
-Express is touted as an augment to Connect.js, however its [website](http://expressjs.com)
-did not sufficiently explain how.
+Replaced `express.js` with `connect.js`. Express' documentation was too terse and its code
+was not suitably documented for use with an IDE. Express is touted as an augment to
+Connect.js, however its [website](http://expressjs.com) did not sufficiently explain how.
 
 However, Connect.js' [website](http://www.senchalabs.org/connect/) is just as terse, if
 not worse. There is **no** documentation of connect itself, just the "middleware" it uses.
