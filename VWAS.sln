@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VWAS", "VWAS\VWAS.csproj", "{0E6905EB-71B2-45A4-88EB-1F8D514CA9F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F1CC3B59-D786-4173-AF3C-741C0EDC7A5E}"
+	ProjectSection(SolutionItems) = preProject
+		WE-settings.xml = WE-settings.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{48AB3DA8-DCBF-416D-B53B-1C77B6BFE13A}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\DevDiary.md = Docs\DevDiary.md
+		Docs\Install.md = Docs\Install.md
+		Docs\ToDo.md = Docs\ToDo.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C49BB962-8B89-4B51-BDA8-8927573B67D7}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E6905EB-71B2-45A4-88EB-1F8D514CA9F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E6905EB-71B2-45A4-88EB-1F8D514CA9F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E6905EB-71B2-45A4-88EB-1F8D514CA9F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E6905EB-71B2-45A4-88EB-1F8D514CA9F3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

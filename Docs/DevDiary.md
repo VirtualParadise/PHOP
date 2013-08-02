@@ -156,4 +156,4 @@ run-once language by design.*
 
 <sup>* After writing this line, I remembered this was wrong; PHP can execute scripts as
 applications. I went on to do some research and found [ReactPHP](http://reactphp.org/).
-I will go ahead and port PHOP to that and see where I go from there.
+I will go ahead and port PHOP to that and see where I go from there.</sup>
