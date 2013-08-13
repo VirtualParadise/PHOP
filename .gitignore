@@ -7,7 +7,8 @@ test.html
 .idea/*
 css/phop.css
 packages/
-Build/VWAS.vshost.exe
 *.suo
 */obj/*
 VWAS/Statics/*.css
+Build/*
+VWAS/Statics/CSS/VWAS*.css

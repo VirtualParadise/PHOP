@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("VWAS")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Virtual World Asset Server")]
+[assembly: AssemblyDescription("Serves assets to virtual worlds via HTTP")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Roy Curtis")]
 [assembly: AssemblyProduct("VWAS")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("WTFPL2")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
