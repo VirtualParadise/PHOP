@@ -6,7 +6,7 @@ namespace VWAS
     [ArgExample("VWAS -p 80", "Runs VWAS on the standard HTTP port 80, mimicking a web server")]
     [ArgExample("VWAS -h localhost -p 80", "Runs VWAS on the standard HTTP port 80 but only serving localhost, for testing")]
     [ArgExample("VWAS -h example.com", "Makes VWAS only serve requests to 'example.com'")]
-    public class ArgsConfig
+    public class AppConfig
     {
         [ArgDescription("Shows the command-line help")]
         [ArgShortcut("?")]
@@ -24,5 +24,26 @@ namespace VWAS
         [ArgDescription("Sets the logging level used by VWAS")]
         [DefaultValue(Defaults.LogLevel)]
         public LogLevels LogLevel { get; set; }
+
+        string url;
+        [ArgIgnore]
+        public string URL
+        {
+            get
+            {
+                if (url != null)
+                    return url;
+
+                url = new UriBuilder()
+                {
+                    Scheme = "http",
+                    Host   = Host,
+                    Port   = Port,
+                    Path   = "/", 
+                }.ToString();
+
+                return url;
+            }
+        }
     }
 }

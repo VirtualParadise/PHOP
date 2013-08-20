@@ -74,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="Types\ArgsConfig.cs" />
+    <Compile Include="Types\AppConfig.cs" />
     <Compile Include="VWAS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
