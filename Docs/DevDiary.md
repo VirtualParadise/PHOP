@@ -5,6 +5,29 @@ JS or PHP applications and those building on PHOP/VWAS.
 
 *These entries are written in no particular order*
 
+## Interest Lost
+This is now the third branch and attempt at trying to re-engineer PHOP/VWAS for something better.
+I am just having too much difficulty trying to make it happen. All the code commited on this branch
+prior to the comittal of this entry is purely a head-on approach with no planning.
+
+I believe these are the sticking points which have been motivation drainers:
+
+* **Over-engineering** - I feel I am over-engineering by trying to set up a system of
+providers, routes, routing, various "good practice" structures and concepts that are not
+actually nessecary or are the wrong direction.
+
+* **I want to use .NET, but non-ASP web development in .NET is lacking** - I had found
+no useful information on serving pages in Google except for the big "ASP.NET 4 MVC" thing. I
+tried it and either I did not understand it properly, or it did not do what I wanted. I want
+to use C# and .NET purely for Visual Studio, which is the only IDE I feel is
+productive. Is this stubbornness holding me back in potental?
+
+* **Too many external distractions** - Minecraft and gaming in general has caught most
+of my attention and energy this summer. I simply have no desire to code for the moment.
+
+PHOP/VWAS should now be considered an abandoned project, except for emergency fixes. Please
+feel free to fork it and continue with it or the concept.
+
 ## Keeping focused on the milestone at hand
 My biggest priority on PHOP *should be* to get the core and already existing code to a
 PHP standalone architecture with React. So far, I have had to stop myself from doing
