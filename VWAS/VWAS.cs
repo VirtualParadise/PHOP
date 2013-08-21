@@ -1,15 +1,16 @@
-﻿using System;
-using System.Threading;
+﻿using PowerArgs;
+using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Reflection;
-using Anna;
-using Anna.Request;
-using PowerArgs;
+using System.Threading;
 
 namespace VWAS
 {
-    class VWAS
+    partial class VWAS
     {
-        const string tag = "VWAS";
+        const  string tag   = "VWAS";
+        static object mutex = new object();
 
         static bool exiting;
         public static bool Exiting
@@ -17,12 +18,44 @@ namespace VWAS
             get { return exiting; }
         }
 
-        public static Version    Version;
-        public static ArgsConfig Arguments;
-        public static HttpServer Server;
+        static uint processing;
+        public static uint Processing
+        {
+            get
+            {
+                lock (mutex)
+                    return processing;
+            }
 
-        // Vanity value; assets served over life-span
-        public static ulong Served = 0;
+            set
+            {
+                lock (mutex)
+                    processing = value;
+            }
+        }
+
+        static ulong served;
+        public static ulong Served
+        {
+            get
+            {
+                lock (mutex)
+                    return served;
+            }
+
+            set
+            {
+                lock (mutex)
+                    served = value;
+            }
+        }
+
+        public static Version      Version;
+        public static AppConfig    Config;
+        public static Router       Router;
+        public static HttpListener Server;
+
+        public static List<IProvider> Providers;
 
         static void Main(string[] args)
         {
@@ -36,21 +69,32 @@ namespace VWAS
 
             Log.Debug(tag, "Entering main loop...");
             while (!Exiting)
-            {
-                Thread.Sleep(100);
-            }
+                ThreadPool.QueueUserWorkItem( Serve, Server.GetContext() );
             Log.Debug(tag, "Exiting main loop...");
 
             takedown();
             TConsole.WriteLineColored(ConsoleColor.White, "### Exiting after serving {0} assets", Served);
         }
 
+        public static void Serve(object state)
+        {
+            Processing++;
+            var context = state as HttpListenerContext;
+
+            Router.Incoming(context);
+            Processing--;
+        }
+
         public static void Exit()
         {
-            if (exiting)
-                return;
-            else
+            lock (mutex)
+            {
+                if (exiting)
+                    return;
+            
                 exiting = true;
+                Log.Info(tag, "Waiting for server to exit...");
+            }
         }
 
         #region Arguments handling
@@ -58,9 +102,9 @@ namespace VWAS
         {
             try
             {
-                Arguments = Args.Parse<ArgsConfig>(args);
+                Config = Args.Parse<AppConfig>(args);
 
-                if ( Arguments.Help )
+                if ( Config.Help )
                 {
                     printArgsHelp();
                     return false;
@@ -79,39 +123,10 @@ namespace VWAS
 
         static void printArgsHelp()
         {
-            var usage = ArgUsage.GetUsage<ArgsConfig>();
+            var usage = ArgUsage.GetUsage<AppConfig>();
             TConsole.WriteColored(ConsoleColor.Cyan, Strings.ArgsHelpTitle);
             Console.WriteLine(Strings.ArgsHelp);
             Console.Write(usage);
-        } 
-        #endregion
-
-        #region Application setup
-        static void setup()
-        {
-            setupLogger();
-
-            Log.Debug(tag, "Setup complete");
-        }
-
-        static void setupLogger()
-        {
-            var clogger = new ConsoleLogger
-            {
-                GroupSimilar = false,
-                TagPadding = 12
-            };
-
-            Log.Loggers.Add(clogger);
-            Log.Level = Arguments.LogLevel;
-            Log.Debug(tag, "Log level set to {0}", Log.Level);
-        } 
-        #endregion
-
-        #region Application takedown
-        static void takedown()
-        {
-            Log.Debug(tag, "Takedown complete");
         } 
         #endregion
     }

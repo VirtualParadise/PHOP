@@ -25,24 +25,18 @@ namespace VWAS
         [DefaultValue(Defaults.LogLevel)]
         public LogLevels LogLevel { get; set; }
 
-        string url;
         [ArgIgnore]
         public string URL
         {
             get
             {
-                if (url != null)
-                    return url;
-
-                url = new UriBuilder()
+                return new UriBuilder()
                 {
                     Scheme = "http",
                     Host   = Host,
                     Port   = Port,
                     Path   = "/", 
                 }.ToString();
-
-                return url;
             }
         }
     }

@@ -37,9 +37,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Anna">
-      <HintPath>..\packages\Anna.1.0.1006\lib\net40\Anna.dll</HintPath>
-    </Reference>
     <Reference Include="PowerArgs">
       <HintPath>..\packages\PowerArgs.1.8.0.0\lib\net40\PowerArgs.dll</HintPath>
     </Reference>
@@ -49,18 +46,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Reactive.Core">
-      <HintPath>..\packages\Rx-Core.2.1.30214.0\lib\Net40\System.Reactive.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces">
-      <HintPath>..\packages\Rx-Interfaces.2.1.30214.0\lib\Net40\System.Reactive.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Linq">
-      <HintPath>..\packages\Rx-Linq.2.1.30214.0\lib\Net40\System.Reactive.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices">
-      <HintPath>..\packages\Rx-PlatformServices.2.1.30214.0\lib\Net40\System.Reactive.PlatformServices.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll</HintPath>
@@ -74,47 +59,34 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="Types\AppConfig.cs" />
+    <Compile Include="Net\ContentTypes.cs" />
+    <Compile Include="Net\Methods.cs" />
+    <Compile Include="Net\RequestException.cs" />
+    <Compile Include="VWAS.Takedown.cs" />
+    <Compile Include="Net\Request.cs" />
+    <Compile Include="Net\Route.cs" />
+    <Compile Include="Net\Router.cs" />
+    <Compile Include="Providers\IProvider.cs" />
+    <Compile Include="Providers\StaticProvider.cs" />
+    <Compile Include="Utility\AppConfig.cs" />
     <Compile Include="VWAS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VWAS.Setup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="PHOP\Debug.php" />
-    <None Include="PHOP\Indexing.php" />
-    <None Include="PHOP\LocalStorage.php" />
-    <None Include="PHOP\PHOP.php" />
-    <None Include="PHOP\Plugins.php" />
-    <None Include="PHOP\plugins\example.php" />
-    <None Include="PHOP\plugins\prim.php" />
-    <None Include="PHOP\RemoteStorage.php" />
-    <None Include="PHOP\Routes.php" />
-    <None Include="PHOP\Views.php" />
-    <None Include="PHOP\views\base.footer.php" />
-    <None Include="PHOP\views\base.header.php" />
-    <None Include="PHOP\views\default.php" />
-    <None Include="PHOP\views\error.php" />
-    <None Include="PHOP\views\index.php" />
     <None Include="Statics\CSS\VWAS.less">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="HTTP\" />
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\Common\" />
     <Folder Include="Views\Front\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="PHOP\primTemplates\facer.txt" />
-    <Content Include="PHOP\primTemplates\flat.txt" />
-    <Content Include="PHOP\primTemplates\floor.txt" />
-    <Content Include="PHOP\primTemplates\panel.txt" />
-    <Content Include="PHOP\primTemplates\triangle.txt" />
-    <Content Include="PHOP\primTemplates\trifloor.txt" />
-    <Content Include="PHOP\primTemplates\wall.txt" />
     <Content Include="Statics\CSS\VWAS.css">
       <DependentUpon>VWAS.less</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -123,6 +95,9 @@
       <DependentUpon>VWAS.less</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Views\Errors\Default.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

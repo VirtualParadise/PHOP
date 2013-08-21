@@ -22,6 +22,44 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C49BB9
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PHOP", "PHOP", "{0994978F-F1B1-429A-A37B-34C9B604259B}"
+	ProjectSection(SolutionItems) = preProject
+		PHOP\Debug.php = PHOP\Debug.php
+		PHOP\Indexing.php = PHOP\Indexing.php
+		PHOP\LocalStorage.php = PHOP\LocalStorage.php
+		PHOP\PHOP.php = PHOP\PHOP.php
+		PHOP\Plugins.php = PHOP\Plugins.php
+		PHOP\RemoteStorage.php = PHOP\RemoteStorage.php
+		PHOP\Routes.php = PHOP\Routes.php
+		PHOP\Views.php = PHOP\Views.php
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{78AA0DE4-CAB9-4B7F-B930-61E6BA16081B}"
+	ProjectSection(SolutionItems) = preProject
+		PHOP\plugins\example.php = PHOP\plugins\example.php
+		PHOP\plugins\prim.php = PHOP\plugins\prim.php
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "primTemplates", "primTemplates", "{F589715E-A6E0-4CA5-9673-23021D4EB020}"
+	ProjectSection(SolutionItems) = preProject
+		PHOP\primTemplates\facer.txt = PHOP\primTemplates\facer.txt
+		PHOP\primTemplates\flat.txt = PHOP\primTemplates\flat.txt
+		PHOP\primTemplates\floor.txt = PHOP\primTemplates\floor.txt
+		PHOP\primTemplates\panel.txt = PHOP\primTemplates\panel.txt
+		PHOP\primTemplates\triangle.txt = PHOP\primTemplates\triangle.txt
+		PHOP\primTemplates\trifloor.txt = PHOP\primTemplates\trifloor.txt
+		PHOP\primTemplates\wall.txt = PHOP\primTemplates\wall.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "views", "views", "{2AA75D65-DADB-4C26-B063-E812311AE5E4}"
+	ProjectSection(SolutionItems) = preProject
+		PHOP\views\base.footer.php = PHOP\views\base.footer.php
+		PHOP\views\base.header.php = PHOP\views\base.header.php
+		PHOP\views\default.php = PHOP\views\default.php
+		PHOP\views\error.php = PHOP\views\error.php
+		PHOP\views\index.php = PHOP\views\index.php
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,5 +73,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{78AA0DE4-CAB9-4B7F-B930-61E6BA16081B} = {0994978F-F1B1-429A-A37B-34C9B604259B}
+		{F589715E-A6E0-4CA5-9673-23021D4EB020} = {0994978F-F1B1-429A-A37B-34C9B604259B}
+		{2AA75D65-DADB-4C26-B063-E812311AE5E4} = {0994978F-F1B1-429A-A37B-34C9B604259B}
 	EndGlobalSection
 EndGlobal
